@@ -1,11 +1,21 @@
+import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View} from 'react-native';
+import Login from './Login.js';
 
 export default function App() {
+  
+  const [login, setLogin] = useState('Empty');
+
+  function handleLogin(name) {
+    console.log("step 2");
+    setLogin(name);
+  }
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <Text>Here is some more text</Text>
+      <Login handleLogin={handleLogin}></Login>
+      <Text>{login}</Text>
       <StatusBar style="auto" />
     </View>
   );
