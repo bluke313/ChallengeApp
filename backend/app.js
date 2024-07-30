@@ -32,8 +32,35 @@ router.route('/').get((req, res) => {
 router.route('/signup').post((req, res) => {
     //add to db
     console.log(req.body)
-    db.run(`INSERT INTO Users (username, email, password) VALUES ('${req.body.username}', '${req.body.email}', '${req.body.password}')`)
-    res.status(200).send("User created")
+
+    db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, (err, row) => {
+        if(err) {
+            error = err
+            console.log(error)
+            res.status(500).send("Database error")
+            return
+        }
+        if(!row){
+            db.get(`SELECT * FROM Users WHERE username = '${req.body.username}'`, (err, row) => {
+                if(err) {
+                    error = err
+                    console.log(error)
+                    res.status(500).send("Database error")
+                    return
+                }
+                if(!row){
+                    db.run(`INSERT INTO Users (username, email, password) VALUES ('${req.body.username}', '${req.body.email}', '${req.body.password}')`)
+                    res.status(200).send("User created")
+                    return
+                }
+                res.status(200).send("Username already exists")
+                return
+            })
+            return
+        }
+        res.status(200).send("Email already exists")
+        return
+    })
 })
 
 router.route('/login').post((req, res) => {
