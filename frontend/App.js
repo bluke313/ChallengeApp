@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View} from 'react-native';
 import Login from './Login.js';
+import SignUp from './SignUp.js'
 
 export default function App() {
   
@@ -12,9 +13,12 @@ export default function App() {
     setLogin(name);
   }
 
+  
+
   return (
     <View style={styles.container}>
-      <Login handleLogin={handleLogin}></Login>
+      {/* {login === 'Empty' ? <Login handleLogin={handleLogin}></Login> : <SignUp></SignUp>} */}
+      <SignUp handleLogin={handleLogin}></SignUp>
       <Text>{login}</Text>
       <StatusBar style="auto" />
     </View>

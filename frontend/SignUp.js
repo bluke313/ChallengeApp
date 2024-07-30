@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 
-const Login = (props) => {
-
+const SignUp = (props) => {
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = async () => {
         console.log("hi")
         try {
             const response = await fetch(
-                'http://localhost:3000/login',
+                'http://localhost:3000/signup',
                 {
                     method: 'POST',
                     headers: {
@@ -18,6 +18,7 @@ const Login = (props) => {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
+                        username: username,
                         email: email,
                         password: password,
                     }),
@@ -37,7 +38,7 @@ const Login = (props) => {
     return (
 
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Sign Up</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -46,12 +47,18 @@ const Login = (props) => {
             />
             <TextInput
                 style={styles.input}
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+            />
+            <TextInput
+                style={styles.input}
                 placeholder="Password"
                 value={password}
                 onChangeText={setPassword}
             />
             <Pressable onPress={handleLogin} style={styles.button}>
-                <Text style={styles.buttonText}>Login</Text>
+                <Text style={styles.buttonText}>Sign Up</Text>
             </Pressable>
         </View>
     );
@@ -87,4 +94,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Login;
+export default SignUp

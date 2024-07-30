@@ -5,6 +5,7 @@ const sqlite3 = require('sqlite3')
 // Set the web server
 const app = express();
 app.use(express.json());
+app.use(cors());
 const port = 3000
 
 // Set up db
@@ -29,37 +30,45 @@ router.route('/').get((req, res) => {
     "password"
 }
 */
+
+//TODO cleanup
 router.route('/signup').post((req, res) => {
-    //add to db
     console.log(req.body)
 
+    //checks for email uniqueness
     db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, (err, row) => {
-        if(err) {
+        if(err) { //db error
             error = err
             console.log(error)
             res.status(500).send("Database error")
             return
         }
-        if(!row){
+        if(!row){ //email is unique now check username
             db.get(`SELECT * FROM Users WHERE username = '${req.body.username}'`, (err, row) => {
-                if(err) {
+                if(err) { //db error
                     error = err
                     console.log(error)
                     res.status(500).send("Database error")
                     return
                 }
-                if(!row){
+                if(!row){ //email and username are unique
                     db.run(`INSERT INTO Users (username, email, password) VALUES ('${req.body.username}', '${req.body.email}', '${req.body.password}')`)
-                    res.status(200).send("User created")
+                    res.status(200).send({"message":"User Created", "success": true, "username": req.body.username})
                     return
                 }
-                res.status(200).send("Username already exists")
-                return
+                else {
+                    // username already exists
+                    res.status(200).send("Username already exists")
+                    return
+                }
             })
             return
         }
-        res.status(200).send("Email already exists")
-        return
+        else {
+            //email exists already
+            res.status(200).send("Email already exists")
+            return
+        }
     })
 })
 
@@ -79,9 +88,8 @@ router.route('/login').post((req, res) => {
             res.status(200).send("No user found")
             return
         }
-        console.log(row.password)
         if(row.password === req.body.password){
-            res.status(200).send("User Logged In")
+            res.status(200).send({"message":"User Logged In", "success": true, "username": row.username})
             return
         }
         res.status(200).send("Password incorrect")
