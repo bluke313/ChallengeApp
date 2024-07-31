@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+import ErrorMessage from './ErrorMessage';
 
 const SignUp = (props) => {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+
 
     const handleLogin = async () => {
         console.log("hi")
@@ -28,6 +31,10 @@ const SignUp = (props) => {
             console.log(json)
             if (json.success) {
                 props.handleLogin(json.username);
+            }
+            else {
+                // Alert.alert('Alert Title', 'My Alert Msg')
+                setErrorMsg(json.message)
             }
             //   return json.movies;
         } catch (error) {
@@ -60,6 +67,7 @@ const SignUp = (props) => {
             <Pressable onPress={handleLogin} style={styles.button}>
                 <Text style={styles.buttonText}>Sign Up</Text>
             </Pressable>
+            <ErrorMessage msg={errorMsg}></ErrorMessage>
         </View>
     );
 };

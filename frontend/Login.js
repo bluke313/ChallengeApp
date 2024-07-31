@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+import ErrorMessage from './ErrorMessage.js'
 
 const Login = (props) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
 
     const handleLogin = async () => {
         console.log("hi")
@@ -27,6 +29,10 @@ const Login = (props) => {
             console.log(json)
             if (json.success) {
                 props.handleLogin(json.username);
+            }
+            else {
+                // Alert.alert('Alert Title', 'My Alert Msg')
+                setErrorMsg(json.message)
             }
             //   return json.movies;
         } catch (error) {
@@ -53,6 +59,7 @@ const Login = (props) => {
             <Pressable onPress={handleLogin} style={styles.button}>
                 <Text style={styles.buttonText}>Login</Text>
             </Pressable>
+            <ErrorMessage msg={errorMsg}></ErrorMessage>
         </View>
     );
 };
@@ -84,7 +91,7 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 16,
-    },
+    }
 });
 
 export default Login;

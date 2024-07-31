@@ -40,7 +40,7 @@ router.route('/signup').post((req, res) => {
         if(err) { //db error
             error = err
             console.log(error)
-            res.status(500).send("Database error")
+            res.status(500).send({"message":"Database error!", "success": false})
             return
         }
         if(!row){ //email is unique now check username
@@ -48,7 +48,7 @@ router.route('/signup').post((req, res) => {
                 if(err) { //db error
                     error = err
                     console.log(error)
-                    res.status(500).send("Database error")
+                    res.status(500).send({"message":"Database error!", "success": false})
                     return
                 }
                 if(!row){ //email and username are unique
@@ -58,7 +58,7 @@ router.route('/signup').post((req, res) => {
                 }
                 else {
                     // username already exists
-                    res.status(200).send("Username already exists")
+                    res.status(200).send({"message":"Username already exists!", "success": false})
                     return
                 }
             })
@@ -66,7 +66,7 @@ router.route('/signup').post((req, res) => {
         }
         else {
             //email exists already
-            res.status(200).send("Email already exists")
+            res.status(200).send({"message":"Account with this email already exists!", "success": false})
             return
         }
     })
@@ -81,18 +81,18 @@ router.route('/login').post((req, res) => {
         if(err) {
             error = err
             console.log(error)
-            res.status(500).send("Database error")
+            res.status(500).send({"message":"Database error!", "success": false})
             return
         }
         if(!row){
-            res.status(200).send("No user found")
+            res.status(200).send({"message":"An account with this email does not exist!", "success": false})
             return
         }
         if(row.password === req.body.password){
             res.status(200).send({"message":"User Logged In", "success": true, "username": row.username})
             return
         }
-        res.status(200).send("Password incorrect")
+        res.status(200).send({"message":"Password incorrect!", "success": false})
         return
     })
 })
