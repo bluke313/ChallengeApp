@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
-import ErrorMessage from './ErrorMessage.js'
+import ErrorMessage from '../ErrorMessage.js'
 
 const Login = (props) => {
 
