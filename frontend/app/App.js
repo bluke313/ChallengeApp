@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Alert} from 'react-native';
-import Login from './Login.js';
-import SignUp from './SignUp.js'
+import { router } from "expo-router";
+import SignUp from './SignUp.js';
 
 
 export default function App() {
@@ -12,6 +12,7 @@ export default function App() {
   function handleLogin(name) {
     console.log("step 2");
     setLogin(name);
+    router.push("/home");
   }
 
   

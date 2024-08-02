@@ -85,7 +85,7 @@ router.route('/login').post((req, res) => {
             return
         }
         if(!row){
-            res.status(200).send({"message":"An account with this email does not exist!", "success": false})
+            res.status(200).send({"message":"An account with this email does not exist!", "success": false, "errCode": 1})
             return
         }
         if(row.password === req.body.password){

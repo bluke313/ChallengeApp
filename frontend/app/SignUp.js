@@ -8,6 +8,7 @@ const SignUp = (props) => {
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
+    
 
     const handleLogin = async () => {
         console.log("hi")
@@ -27,16 +28,14 @@ const SignUp = (props) => {
                     }),
                 }
             );
-            const json = await response.json();
-            console.log(json)
-            if (json.success) {
-                props.handleLogin(json.username);
+            const responseJson = await response.json();
+            console.log(responseJson)
+            if (responseJson.success) {
+                props.handleLogin(responseJson.username);
             }
             else {
-                // Alert.alert('Alert Title', 'My Alert Msg')
-                setErrorMsg(json.message)
+                setErrorMsg(responseJson.message)
             }
-            //   return json.movies;
         } catch (error) {
             console.error(error);
         }
@@ -81,7 +80,10 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         marginBottom: 16,
-        textAlign: 'center',
+        position: 'absolute',
+        top: 20,
+        padding: 10,
+        alignSelf: 'center',
     },
     input: {
         height: 40,
@@ -89,12 +91,16 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 12,
         paddingHorizontal: 8,
+        width: 220,
+        alignSelf: 'center',
     },
     button: {
         backgroundColor: '#007BFF',
         padding: 10,
         alignItems: 'center',
+        alignSelf: 'center',
         borderRadius: 5,
+        minWidth: 100,
     },
     buttonText: {
         color: '#fff',

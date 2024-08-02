@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
         borderRadius: "0.375rem",
         color: "#fff",
         textAlign: 'center',
+        alignSelf: 'center',
         padding: '10px',
         margin: 4,
         maxWidth: 174,

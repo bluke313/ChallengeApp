@@ -15,19 +15,19 @@ const RootLayout = () => {
             <Stack.Screen
                 name="Login"
                 options={{
-                    headerTitle: "Login page",
-                    headerStyle: {
-                        backgroundColor: "green"
-                    },
+                    headerShown: false,
                 }}
             />
             <Stack.Screen
-                name="SignUp"
+                name='SignUp'
                 options={{
-                    headerTitle: "Sign Up page",
-                    headerStyle: {
-                        backgroundColor: "yellow"
-                    },
+                    headerTitle: '',
+                }}
+            />
+            <Stack.Screen
+                name="home"
+                options={{
+                    headerShown: false,
                 }}
             />
         </Stack>

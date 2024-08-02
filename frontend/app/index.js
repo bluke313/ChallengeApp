@@ -5,11 +5,16 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
-        <Link href="/Login">Go to Login</Link>
-        <Pressable onPress={() => router.push("/SignUp")}>
-          <Text>Go to Sign Up</Text>
+        <Text style={styles.title}>Challenge App</Text>
+        <Text style={styles.subtitle}>Dev navigation page</Text>
+        <Pressable style={styles.button} onPress={() => router.push("/Login")}>
+          <Text style={styles.buttonText}>Login</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => router.push("/SignUp")}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </Pressable>
+        <Pressable style={styles.button} onPress={() => router.push("/home")}>
+          <Text style={styles.buttonText}>home</Text>
         </Pressable>
       </View>
     </View>
@@ -36,4 +41,15 @@ const styles = StyleSheet.create({
     fontSize: 36,
     color: "#38434D",
   },
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 5,
+    margin: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+}
 });
