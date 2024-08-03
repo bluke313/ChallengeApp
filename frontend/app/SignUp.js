@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, component } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+import { Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
 
 const SignUp = (props) => {
@@ -7,8 +8,10 @@ const SignUp = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [allowSignUp, setAllowSignUp] = useState(false);
 
-    
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const handleLogin = async () => {
         console.log("hi")
@@ -41,6 +44,26 @@ const SignUp = (props) => {
         }
     };
 
+    const validifyLogin = () => {
+
+        if (emailPattern.test(email) && password && username) {
+            setAllowSignUp(true);
+        }
+        else {
+            setAllowSignUp(false);
+        }        
+    };
+
+    const handleKeyPress = (event) => {
+        if (event.nativeEvent.key === 'Enter') {
+            handleLogin();
+        }
+    };
+
+    useEffect(() => {
+        validifyLogin();
+    }, [email, username, password]);
+
     return (
 
         <View style={styles.container}>
@@ -57,15 +80,27 @@ const SignUp = (props) => {
                 value={username}
                 onChangeText={setUsername}
             />
-            <TextInput
-                style={styles.input}
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-            />
-            <Pressable onPress={handleLogin} style={styles.button}>
+            <View style={styles.password}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    onKeyPress={handleKeyPress}
+                    secureTextEntry={!showPassword}
+                />
+                <Pressable onPress={() => setShowPassword(!showPassword)} style={{ width: 0, right: 37 }}>
+                    <Text selectable={false} style={styles.showPassword}>
+                        {showPassword ? '\u{1F512}' : '\u{1F513}'}
+                    </Text>
+                </Pressable>
+            </View>
+            <Pressable disabled={!allowSignUp} onPress={handleLogin} style={ allowSignUp ? styles.button : styles.disabledButton}>
                 <Text style={styles.buttonText}>Sign Up</Text>
             </Pressable>
+            <Link style={styles.link} href='/Login'>
+                <Text style={styles.linkText}>I already have an account</Text>
+            </Link>
             <ErrorMessage msg={errorMsg}></ErrorMessage>
         </View>
     );
@@ -75,6 +110,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
         paddingHorizontal: 16,
     },
     title: {
@@ -102,10 +138,31 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         minWidth: 100,
     },
+    disabledButton: {
+        backgroundColor: '#add5ff',
+        padding: 10,
+        alignItems: 'center',
+        alignSelf: 'center',
+        borderRadius: 5,
+        minWidth: 100,
+    },
     buttonText: {
         color: '#fff',
         fontSize: 16,
     },
+    link: {
+        alignSelf: 'center',
+        margin: 5,
+    },
+    linkText: {
+        color: 'blue',
+    },
+    password: {
+        flexDirection: 'row',
+    },
+    showPassword: {
+        fontSize: 30,
+    }
 });
 
 export default SignUp
