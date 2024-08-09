@@ -34,7 +34,7 @@ const SignUp = (props) => {
             const responseJson = await response.json();
             console.log(responseJson)
             if (responseJson.success) {
-                props.handleLogin(responseJson.username);
+                // props.handleLogin(responseJson.username);
             }
             else {
                 setErrorMsg(responseJson.message)

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3')
+const bcrypt = require('bcrypt')
 
 // Set the web server
 const app = express();
@@ -32,11 +33,11 @@ router.route('/').get((req, res) => {
 */
 
 //TODO cleanup
-router.route('/signup').post((req, res) => {
+router.route('/signup').post( async (req, res) => {
     console.log(req.body)
 
     //checks for email uniqueness
-    db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, (err, row) => {
+    db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, async (err, row) => {
         if(err) { //db error
             error = err
             console.log(error)
@@ -44,7 +45,7 @@ router.route('/signup').post((req, res) => {
             return
         }
         if(!row){ //email is unique now check username
-            db.get(`SELECT * FROM Users WHERE username = '${req.body.username}'`, (err, row) => {
+            db.get(`SELECT * FROM Users WHERE username = '${req.body.username}'`, async (err, row) => {
                 if(err) { //db error
                     error = err
                     console.log(error)
@@ -52,7 +53,10 @@ router.route('/signup').post((req, res) => {
                     return
                 }
                 if(!row){ //email and username are unique
-                    db.run(`INSERT INTO Users (username, email, password) VALUES ('${req.body.username}', '${req.body.email}', '${req.body.password}')`)
+                    const saltRounds = 10
+                    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds)
+                    // console.log(hashedPassword)
+                    db.run(`INSERT INTO Users (username, email, password) VALUES ('${req.body.username}', '${req.body.email}', '${hashedPassword}')`)
                     res.status(200).send({"message":"User Created", "success": true, "username": req.body.username})
                     return
                 }
@@ -72,12 +76,12 @@ router.route('/signup').post((req, res) => {
     })
 })
 
-router.route('/login').post((req, res) => {
+router.route('/login').post(async (req, res) => {
     //add to db
     console.log(req.body)
     let error = null
     let password = null
-    db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, (err, row) => {
+    db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, async (err, row) => {
         if(err) {
             error = err
             console.log(error)
@@ -88,7 +92,8 @@ router.route('/login').post((req, res) => {
             res.status(200).send({"message":"An account with this email does not exist!", "success": false, "errCode": 1})
             return
         }
-        if(row.password === req.body.password){
+        const match = await bcrypt.compare(req.body.password, row.password)
+        if(match){
             res.status(200).send({"message":"User Logged In", "success": true, "username": row.username})
             return
         }
