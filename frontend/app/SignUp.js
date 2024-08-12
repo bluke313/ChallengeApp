@@ -2,7 +2,6 @@ import React, { useState, useEffect, component } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import { Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
-import * as SecureStore from 'expo-secure-store';
 import {storeSecret} from './Storage.js'
 
 

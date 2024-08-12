@@ -1,12 +1,13 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { dropSecret } from '../Storage.js';
 
 const home = () => {
     return (
         <View>
             <Text style={styles.title}>Home Page</Text>
             <Pressable 
-                onPress={() => router.push('/Login')}
+                onPress={() => {dropSecret('authToken'); router.push('/Login')}}
                 style={styles.button}
             >
             <Text style={styles.buttonText}>Sign Out
