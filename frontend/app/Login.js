@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import { router, Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage.js';
+import {storeSecret} from './Storage.js'
 
 const Login = (props) => {
 
@@ -33,6 +34,7 @@ const Login = (props) => {
             const responseJson = await response.json();
             console.log(responseJson)
             if (responseJson.success) {
+                await storeSecret('authToken', responseJson.token)
                 router.push(`/${responseJson.username}/home`);
             }
             // BELOW IS AN ATTEMPT TO MAKE LOGIN ATTEMPTS WITH NEW EMAILS SEND YOU TO SIGNUP WITH THE EMAIL ALREADY ENTERED

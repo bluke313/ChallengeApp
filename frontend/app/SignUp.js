@@ -2,6 +2,9 @@ import React, { useState, useEffect, component } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import { Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
+import * as SecureStore from 'expo-secure-store';
+import {storeSecret} from './Storage.js'
+
 
 const SignUp = (props) => {
     const [email, setEmail] = useState('');
@@ -35,6 +38,7 @@ const SignUp = (props) => {
             console.log(responseJson)
             if (responseJson.success) {
                 // props.handleLogin(responseJson.username);
+                await storeSecret('authToken', responseJson.token)
             }
             else {
                 setErrorMsg(responseJson.message)
