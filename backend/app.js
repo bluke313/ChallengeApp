@@ -21,6 +21,23 @@ const router = express.Router()
 
 app.use('/', router)
 
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+  
+    if (token == null) return res.sendStatus(401)
+  
+    jwt.verify(token, "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi", (err, user) => {
+      console.log(err)
+  
+      if (err) return res.sendStatus(403)
+  
+      req.body.username = user
+  
+      next()
+    })
+  }
+
 router.route('/').get((req, res) => {
     res.send("hello world on router")
 })
@@ -32,6 +49,12 @@ router.route('/').get((req, res) => {
     "password"
 }
 */
+
+//TODO work in user id?? if needed idk if it needs to be in the endpoint url or not
+router.route('/home').get(authenticateToken, (req, res) => {
+    res.send("You should only see this with a valid token")
+})
+
 
 //TODO cleanup
 router.route('/signup').post(async (req, res) => {
