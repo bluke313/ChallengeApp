@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import IndicatorButton from '../Components/Button';
 import UserIcon from '../Components/Icons';
+import TabSelect from '../Components/Tabs';
 
 const Profile = () => {
     return (
@@ -13,6 +14,7 @@ const Profile = () => {
                 <Text style={styles.header1}>mailman</Text>
                 <Text style={styles.bio}>Liam | UX/UI Designer 🎨 | Turning ideas into seamless experiences ✨ | Coffee addict ☕ | Always sketching the next big thing 🚀</Text>
                 <IndicatorButton>13 Group Mates</IndicatorButton>
+                <TabSelect tabItems={["Challenges", "Personal Info"]}/>
             </View>
 
         </View>

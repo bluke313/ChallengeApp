@@ -11,6 +11,7 @@ export default function IndicatorButton({children}) {
 
 const styles = StyleSheet.create({
   buttonStyle: {
+    userSelect: "none",
     padding: 8,
     marginTop: 4,
     marginBottom: 4,
