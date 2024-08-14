@@ -31,7 +31,7 @@ function savePhoto(data, userId, uploadDate) {
     db.run(`INSERT INTO Images (image, timestamp, userId) VALUES ('${data}', '${uploadDate}', ${userId})`);
 }
 
-savePhoto("asdfeff", 16, 'fhasdfk')
+// savePhoto("asdfeff", 16, 'fhasdfk')
 
 // imageToBytes('../frontend/assets/example-user-icon.jpg')
 
@@ -174,6 +174,13 @@ router.route('/login').post(async (req, res) => {
         res.status(200).send({ "message": "Password incorrect!", "success": false })
         return
     })
+})
+
+router.route('/upload').post(async (req, res) => {
+
+
+    console.log(req.body)
+    return "Hello world"
 })
 
 app.listen(port, () => {

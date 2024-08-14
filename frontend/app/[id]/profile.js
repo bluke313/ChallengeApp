@@ -4,6 +4,8 @@ import UserIcon from '../Components/Icons';
 import TabSelect, { TabArea } from '../Components/Tabs';
 import { useState } from 'react'
 import { shouldUseActivityState } from 'react-native-screens';
+import PhotoUpload from '../Components/PhotoUpload';
+
 
 const Profile = () => {
     const [active, setActive] = useState(0)
@@ -33,7 +35,8 @@ const Profile = () => {
                 <TabArea active={active}>
                     <ChallengesView />
                     {/* <Text>2</Text> */}
-                    <Text>2</Text>
+                    {/* <Text>2</Text> */}
+                    <PhotoUpload />
                 </TabArea>
             </View>
         </View>
