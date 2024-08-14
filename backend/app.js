@@ -3,6 +3,7 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3')
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken");
+const fs = require("fs")
 
 // Set the web server
 const app = express();
@@ -20,6 +21,19 @@ const db = new sqlite3.Database('./database.db')
 const router = express.Router()
 
 app.use('/', router)
+
+function imageToBytes(filePath) {
+    const data = fs.readFileSync(filePath).toString('binary')
+    console.log(data)
+}
+
+function savePhoto(data, userId, uploadDate) {
+    db.run(`INSERT INTO Images (image, timestamp, userId) VALUES ('${data}', '${uploadDate}', ${userId})`);
+}
+
+savePhoto("asdfeff", 16, 'fhasdfk')
+
+// imageToBytes('../frontend/assets/example-user-icon.jpg')
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
