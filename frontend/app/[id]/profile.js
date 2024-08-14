@@ -1,9 +1,23 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import IndicatorButton from '../Components/Button';
 import UserIcon from '../Components/Icons';
-import TabSelect from '../Components/Tabs';
+import TabSelect, { TabArea } from '../Components/Tabs';
+import { useState } from 'react'
+import { shouldUseActivityState } from 'react-native-screens';
 
 const Profile = () => {
+    const [active, setActive] = useState(0)
+
+
+    const ChallengesView = () => {
+        const challenges = [1,2,3,4,5,6,7]
+        return (
+            <View style={styles.challengeViewStyle}>
+                {challenges.map((item, i) => <View key={i} style={styles.smallChallengeViewStyle}></View>)}                
+            </View>
+        )
+    }
+
     return (
         <View style={styles.mainView}>
             <View style={styles.topView}>
@@ -14,9 +28,14 @@ const Profile = () => {
                 <Text style={styles.header1}>mailman</Text>
                 <Text style={styles.bio}>Liam | UX/UI Designer 🎨 | Turning ideas into seamless experiences ✨ | Coffee addict ☕ | Always sketching the next big thing 🚀</Text>
                 <IndicatorButton>13 Group Mates</IndicatorButton>
-                <TabSelect tabItems={["Challenges", "Personal Info"]}/>
+                <View style={styles.bufferStyle}></View>
+                <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
+                <TabArea active={active}>
+                    <ChallengesView />
+                    {/* <Text>2</Text> */}
+                    <Text>2</Text>
+                </TabArea>
             </View>
-
         </View>
     );
 };
@@ -26,6 +45,11 @@ const styles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 16,
         textAlign: 'center',
+    },
+    bufferStyle: {
+        display: "block",
+        height: 12,
+        widht: 1,
     },
     header1: {
         fontSize: 24,
@@ -53,6 +77,23 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 0 - 44,
         right: 16 //NOTE 24 might be better
+    },
+    challengeViewStyle: {
+        marginTop: 8,
+        marginLeft: "auto",
+        marginRight: "auto",
+        backgroundColor: "red",
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "start",
+        rowGap: 10,
+        gap: 10,
+    },
+    smallChallengeViewStyle: {
+        backgroundColor: "black",
+        width: 100,
+        height: 100
     }
 });
 

@@ -2,24 +2,29 @@ import { useState } from "react";
 import { StyleSheet, Text, View, Pressable, Image, Button } from "react-native";
 // import userIcon from '/'
 
-export default function TabSelect({tabItems, onChangeTab}) {
-
-  const [active, setActive] = useState(0)
-  
+export default function TabSelect({tabItems, setActive, active}) {
 
   const Tab = ({children, index, onPress}) => {
+
     return (
       <Pressable onPress={onPress} style={active == index ? {...styles.buttonStyle, width: `${100 / tabItems.length}%`} : {...styles.buttonStyle, backgroundColor: "rgba(0,0,0,0)", width: `${100 / tabItems.length}%`}}>
         <Text style={styles.textStyle}>{children}</Text>
       </Pressable>
     )
   }
+  
 
   return (
     <View style={styles.containerStyle}>
-      {tabItems.map((item, i) => <Tab key={i} index={i} onPress={() => {setActive(i); console.log(i)}}>{item}</Tab>)}
+      {tabItems.map((item, i) => <Tab key={i} index={i} onPress={() => setActive(i)}>{item}</Tab>)}
     </View>
   );
+}
+
+export function TabArea({children, active}) {
+  return (
+    children[active]
+  )
 }
 
 const styles = StyleSheet.create({
