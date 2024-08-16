@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~3.2.1",
     "@types/react": "~18.2.79",
+    "axios": "^1.7.4",
     "expo": "~51.0.17",
     "expo-constants": "~16.0.2",
     "expo-linking": "~6.3.1",

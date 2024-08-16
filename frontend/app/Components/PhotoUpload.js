@@ -1,21 +1,10 @@
 import { useState } from 'react';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { View, Image, Button, Platform } from 'react-native';
+import axios from 'axios';
 
 export default function PhotoUpload() {
     const [photo, setPhoto] = useState(null)
-
-    const createFormData = (photo) => {
-        return JSON.stringify({
-            'photo': {
-                "name": photo.fileName,
-                "type": photo.type,
-                "uri": Platform.OS === 'ios' ? photo.uri.replace('file://', '') : photo.uri,
-                "photo": handlePhotoUpload
-            },
-            "userId": 16
-        })
-      };
 
     const handleChoosePhoto = () => {
         launchImageLibrary({noData: true}, (resp) => {
@@ -25,55 +14,20 @@ export default function PhotoUpload() {
         })
     }
 
-    // const handlePhotoUpload = () => {
-    //     fetch(`http://localhost:3000/upload`, {
-    //         method: 'POST',
-    //         headers: {
-    //             Accept: 'multipart/form-data',
-    //             'Content-Type': 'multipart/form-data',
-    //         },
-    //         "MIME-Version": "1.0",
-    //         body: createFormData(photo),
-    //       })
-    //         .then((response) => response.json())
-    //         .then((response) => {
-    //           console.log('response', response);
-    //         })
-    //         .catch((error) => {
-    //           console.log('error', error);
-    //         });
-    // }
-
     const handlePhotoUpload = async () => {
-        if (photo) {
-          const formData = new FormData();
-          formData.append('photo', {
-            uri: photo.uri,
-            name: photo.fileName || 'photo.jpg', // Default to 'photo.jpg' if filename is not provided
-            type: photo.type || 'image/jpeg', // Default to 'image/jpeg' if type is not provided
-          });
-    
-          try {
-            const response = await fetch('http://localhost:3000/upload', {
-              method: 'POST',
-              body: formData,
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            });
-    
-            const result = await response.json();
-            console.log('Success:', result);
-          } catch (error) {
-            console.error('Error:', error);
-          }
-        }
+        const data = new FormData() //creates binary to transfer photo
+        data.append('file', photo) //adds photo to the binary
+
+        axios.post('http://localhost:3000/upload', data) //sends photo the backend
+          .then((res) => {
+            console.log(res)
+          })
       };
     
 
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <input type='file' onChange={(e) => setPhoto(e.target.files[0])}></input>
+            <input type='file' name='file' onChange={(e) => setPhoto(e.target.files[0])}></input>
           {photo && (
             <>
               <Image

@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3')
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken");
 const fs = require("fs")
+const multer = require('multer') //import for storing images
 
 // Set the web server
 const app = express();
@@ -14,13 +15,21 @@ const port = 3000
 // Set up db
 const db = new sqlite3.Database('./database.db')
 
-// app.get('/', (req, res) => {
-//     res.send("Hello World")
-// })
-
 const router = express.Router()
 
 app.use('/', router)
+
+// dictates the storage for a photo upload
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public') // saying we want to store in ./public/ directory
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname) //creates filename for the photo
+    }
+})
+
+const upload = multer({storage: storage}).single('file') //Tbh idk what this does
 
 function imageToBytes(filePath) {
     const data = fs.readFileSync(filePath).toString('binary')
@@ -177,11 +186,17 @@ router.route('/login').post(async (req, res) => {
 })
 
 router.route('/upload').post(async (req, res) => {
-
-
-    console.log(req.body)
-    return "Hello world"
+    upload(req, res, (err) => { //initiates the storage function for the photo
+        if (err) {
+            console.log(err)
+            res.sendStatus(500)
+        }
+        res.send(req.file)
+    })
 })
+
+app.use(express.static('public'));
+
 
 app.listen(port, () => {
     console.log('Listening on port ' + port)
