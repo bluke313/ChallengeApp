@@ -196,11 +196,21 @@ router.route('/upload').post(async (req, res) => {
             console.log(err)
             res.sendStatus(500)
         }
-        console.log(req.body)
-        console.log(req.file.path)
+        const username = JSON.parse(req.body.body).username
+        const caption = JSON.parse(req.body.body).caption
+        const filePath = req.file.path
+        const timestamp = "11-11-11"
 
-
-
+        db.get(`SELECT id FROM Users WHERE username = '${username}'`, async (err, row) => {
+            if (err) {
+                error = err
+                console.log(error)
+                res.status(500).send({ "message": "Database error!", "success": false })
+                return
+            }
+            const userId = row.id
+            db.run(`INSERT INTO Images (path, timestamp, userId, caption) VALUES ('${filePath}', '${timestamp}', ${userId}, '${caption}')`)
+        })
         res.send(req.file)
     })
 })

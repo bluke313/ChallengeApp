@@ -66,7 +66,7 @@ const Profile = () => {
                     <ChallengesView />
                     {/* <Text>2</Text> */}
                     {/* <Text>2</Text> */}
-                    <PhotoUpload />
+                    <PhotoUpload username={user} />
                 </TabArea>
             </View>
         </View>

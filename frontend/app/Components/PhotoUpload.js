@@ -4,7 +4,7 @@ import { View, Image, Button, Platform } from 'react-native';
 import axios from 'axios';
 import retrieveSecret from '../Storage.js'
 
-export default function PhotoUpload() {
+export default function PhotoUpload({username}) {
     const [photo, setPhoto] = useState(null)
 
     const handleChoosePhoto = () => {
@@ -20,7 +20,8 @@ export default function PhotoUpload() {
         data.append('file', photo) //adds photo to the binary
         data.append('body', JSON.stringify({
           "caption": "Hey this is my photo",
-          "token": `${retrieveSecret('authToken')}`,
+          // "token": `${retrieveSecret('authToken')}`,
+          "username": username
         }))
 
         axios.post('http://localhost:3000/upload', data) //sends photo the backend
