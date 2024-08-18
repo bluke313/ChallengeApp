@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Image } from 'react-native';
 import IndicatorButton from '../Components/Button';
 import UserIcon from '../Components/Icons';
 import TabSelect, { TabArea } from '../Components/Tabs';
@@ -11,13 +11,21 @@ import {retrieveSecret} from '../Storage.js'
 const Profile = () => {
     const [active, setActive] = useState(0)
     const [user, setUser] = useState(null)
+    const [challenges, setChallenges] = useState([])
+    const [fresh, setFresh] = useState(true)
 
 
-    const ChallengesView = () => {
-        const challenges = [1,2,3,4,5,6,7]
+    const ChallengesView = ({challenges}) => {
+        // const challenges = [1,2,3,4,5,6,7]
         return (
             <View style={styles.challengeViewStyle}>
-                {challenges.map((item, i) => <View key={i} style={styles.smallChallengeViewStyle}></View>)}                
+                {/* {challenges.map((item, i) => <View key={i} style={styles.smallChallengeViewStyle}></View>)}                 */}
+                {challenges.map((item, i) => <Image 
+                key={`${user}-image-${i}`}
+                style={styles.smallChallengeImageStyle}
+                source={{
+                    uri: `http://localhost:3000/${item.path}`,
+                }}></Image>)}                
             </View>
         )
     }
@@ -43,12 +51,13 @@ const Profile = () => {
                 const responseJson = await response.json();
                 console.log(responseJson)
                 setUser(responseJson.username)
+                setChallenges(responseJson.images)
             } catch (error) {
                 console.error(error);
             }
         }
         fetchProfile()
-    }, [])
+    }, [fresh])
 
     return (
         <View style={styles.mainView}>
@@ -63,10 +72,10 @@ const Profile = () => {
                 <View style={styles.bufferStyle}></View>
                 <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
                 <TabArea active={active}>
-                    <ChallengesView />
+                    <ChallengesView challenges={challenges}/>
                     {/* <Text>2</Text> */}
                     {/* <Text>2</Text> */}
-                    <PhotoUpload username={user} />
+                    <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
                 </TabArea>
             </View>
         </View>
@@ -125,6 +134,10 @@ const styles = StyleSheet.create({
     },
     smallChallengeViewStyle: {
         backgroundColor: "black",
+        width: 100,
+        height: 100
+    },
+    smallChallengeImageStyle: {
         width: 100,
         height: 100
     }

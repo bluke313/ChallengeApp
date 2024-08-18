@@ -4,7 +4,7 @@ import { View, Image, Button, Platform } from 'react-native';
 import axios from 'axios';
 import retrieveSecret from '../Storage.js'
 
-export default function PhotoUpload({username}) {
+export default function PhotoUpload({username, fresh}) {
     const [photo, setPhoto] = useState(null)
 
     const handleChoosePhoto = () => {
@@ -28,6 +28,8 @@ export default function PhotoUpload({username}) {
           .then((res) => {
             console.log(res)
           })
+
+        fresh()
       };
     
 

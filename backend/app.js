@@ -5,10 +5,12 @@ const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken");
 const fs = require("fs")
 const multer = require('multer') //import for storing images
+const path = require('path')
 
 // Set the web server
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 const port = 3000
 
@@ -187,8 +189,53 @@ router.route('/login').post(async (req, res) => {
 
 router.route('/profile').post(authenticateToken, async (req, res) => {
     console.log(req.body)
-    res.status(200).send({"username": req.body.userId.userId})
+
+    db.all(`
+        SELECT Images.path, Images.timestamp, Images.caption FROM Images 
+        inner join Users 
+        on Users.id = Images.userId 
+        where Users.username = '${req.body.userId.userId}'
+        order by Images.timestamp;
+        `, async (err, row) => {
+            if (err) {
+                error = err
+                console.log(error)
+                res.status(500).send({ "message": "Database error!", "success": false })
+                return
+            }
+            const imagePaths = formateImagePathsFromDBRows(row)
+            res.status(200).send({"username": req.body.userId.userId, "images": imagePaths})
+            return
+        })
+
+        // res.sendStatus(500)
+
 })
+
+function formateImagePathsFromDBRows(rows){
+    let paths = []
+
+    for(let i = 0; i < rows.length; i++){
+        paths.push({
+            "path": rows[i].path.slice(7), 
+            "caption": rows[i].caption,
+            "timestamp": rows[i].timestamp
+        })
+    }
+
+    return paths
+}
+
+function getDateTimeForDB() {
+    const date = new Date()
+    const day = ("0" + date.getDate()).slice(-2)
+    const month = ("0" + date.getMonth() + 1).slice(-2)
+    const year = date.getFullYear()
+    const hour = date.getHours()
+    const min = date.getMinutes()
+    const second = date.getSeconds()
+    return `${year}-${month}-${day} ${hour}:${min}:${second}`
+}
 
 router.route('/upload').post(async (req, res) => {
     upload(req, res, (err) => { //initiates the storage function for the photo
@@ -199,7 +246,8 @@ router.route('/upload').post(async (req, res) => {
         const username = JSON.parse(req.body.body).username
         const caption = JSON.parse(req.body.body).caption
         const filePath = req.file.path
-        const timestamp = "11-11-11"
+        const timestamp = getDateTimeForDB()
+        console.log(timestamp)
 
         db.get(`SELECT id FROM Users WHERE username = '${username}'`, async (err, row) => {
             if (err) {
