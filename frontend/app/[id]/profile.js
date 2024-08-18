@@ -6,57 +6,13 @@ import { useEffect, useState } from 'react'
 import { shouldUseActivityState } from 'react-native-screens';
 import PhotoUpload from '../Components/PhotoUpload';
 import {retrieveSecret} from '../Storage.js'
+import {ChallengesView} from '../Components/Challenges.js'
 
 
 const Profile = () => {
     const [active, setActive] = useState(0)
     const [user, setUser] = useState(null)
     const [fresh, setFresh] = useState(true)
-
-
-    const ChallengesView = ({fresh}) => {
-        const [challenges, setChallenges] = useState([])
-
-        useEffect(() => {
-            const fetchProfile = async () => {
-                try {
-                    const token = await retrieveSecret('authToken')
-                    console.log(`Token: ${token}`)
-                    const response = await fetch(
-                        'http://localhost:3000/profile',
-                        {
-                            method: 'POST',
-                            headers: {
-                                Accept: 'application/json',
-                                'Content-Type': 'application/json',
-                                authorization: `Bearer ${token}`
-                            },
-                            body: JSON.stringify({
-                            }),
-                        }
-                    );
-                    const responseJson = await response.json();
-                    console.log(responseJson)
-                    setChallenges(responseJson.images)
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-            fetchProfile()
-        }, [fresh])
-        // const challenges = [1,2,3,4,5,6,7]
-        return (
-            <View style={styles.challengeViewStyle}>
-                {/* {challenges.map((item, i) => <View key={i} style={styles.smallChallengeViewStyle}></View>)}                 */}
-                {challenges.map((item, i) => <Image 
-                key={`${user}-image-${i}`}
-                style={styles.smallChallengeImageStyle}
-                source={{
-                    uri: `http://localhost:3000/${item.path}`,
-                }}></Image>)}                
-            </View>
-        )
-    }
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -100,7 +56,7 @@ const Profile = () => {
                 <View style={styles.bufferStyle}></View>
                 <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
                 <TabArea active={active}>
-                    <ChallengesView fresh={fresh}/>
+                    <ChallengesView user={user} fresh={fresh}/>
                     {/* <Text>2</Text> */}
                     {/* <Text>2</Text> */}
                     <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
@@ -147,27 +103,6 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 0 - 44,
         right: 16 //NOTE 24 might be better
-    },
-    challengeViewStyle: {
-        marginTop: 8,
-        marginLeft: "auto",
-        marginRight: "auto",
-        backgroundColor: "red",
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "start",
-        rowGap: 10,
-        gap: 10,
-    },
-    smallChallengeViewStyle: {
-        backgroundColor: "black",
-        width: 100,
-        height: 100
-    },
-    smallChallengeImageStyle: {
-        width: 100,
-        height: 100
     }
 });
 
