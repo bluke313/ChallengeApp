@@ -26,23 +26,22 @@ export async function storeSecret(key, value){
 export async function retrieveSecret(key){
     if(Platform.OS == 'web'){
         try {
-            localStorage.getItem(key)
+            const token = localStorage.getItem(key)
+            return token
         }
         catch (e){
             console.log(e)
-            return false
+            return null
         }
     }
-    else {
-        try {
-            await SecureStore.getItemAsync(key)
-        }
-        catch (e){
-            console.log(e)
-            return false
-        }
+    try {
+        const token = await SecureStore.getItemAsync(key)
+        return token
     }
-    return true
+    catch (e){
+        console.log(e)
+        return null
+    }
 }
 
 export async function dropSecret(key){

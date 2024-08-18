@@ -47,15 +47,15 @@ function savePhoto(data, userId, uploadDate) {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-  
     if (token == null) return res.sendStatus(401)
   
-    jwt.verify(token, "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi", (err, user) => {
+    console.log(authHeader)
+    jwt.verify(token, "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi", (err, userId) => {
       console.log(err)
   
       if (err) return res.sendStatus(403)
   
-      req.body.username = user
+      req.body.userId = userId
   
       next()
     })
@@ -185,12 +185,22 @@ router.route('/login').post(async (req, res) => {
     })
 })
 
+router.route('/profile').post(authenticateToken, async (req, res) => {
+    console.log(req.body)
+    res.status(200).send({"username": req.body.userId.userId})
+})
+
 router.route('/upload').post(async (req, res) => {
     upload(req, res, (err) => { //initiates the storage function for the photo
         if (err) {
             console.log(err)
             res.sendStatus(500)
         }
+        console.log(req.body)
+        console.log(req.file.path)
+
+
+
         res.send(req.file)
     })
 })

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { View, Image, Button, Platform } from 'react-native';
 import axios from 'axios';
+import retrieveSecret from '../Storage.js'
 
 export default function PhotoUpload() {
     const [photo, setPhoto] = useState(null)
@@ -17,6 +18,10 @@ export default function PhotoUpload() {
     const handlePhotoUpload = async () => {
         const data = new FormData() //creates binary to transfer photo
         data.append('file', photo) //adds photo to the binary
+        data.append('body', JSON.stringify({
+          "caption": "Hey this is my photo",
+          "token": `${retrieveSecret('authToken')}`,
+        }))
 
         axios.post('http://localhost:3000/upload', data) //sends photo the backend
           .then((res) => {

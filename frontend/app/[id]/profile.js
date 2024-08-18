@@ -2,13 +2,15 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import IndicatorButton from '../Components/Button';
 import UserIcon from '../Components/Icons';
 import TabSelect, { TabArea } from '../Components/Tabs';
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { shouldUseActivityState } from 'react-native-screens';
 import PhotoUpload from '../Components/PhotoUpload';
+import {retrieveSecret} from '../Storage.js'
 
 
 const Profile = () => {
     const [active, setActive] = useState(0)
+    const [user, setUser] = useState(null)
 
 
     const ChallengesView = () => {
@@ -19,6 +21,34 @@ const Profile = () => {
             </View>
         )
     }
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const token = await retrieveSecret('authToken')
+                console.log(`Token: ${token}`)
+                const response = await fetch(
+                    'http://localhost:3000/profile',
+                    {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                            authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                        }),
+                    }
+                );
+                const responseJson = await response.json();
+                console.log(responseJson)
+                setUser(responseJson.username)
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchProfile()
+    }, [])
 
     return (
         <View style={styles.mainView}>
