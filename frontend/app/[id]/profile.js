@@ -11,11 +11,39 @@ import {retrieveSecret} from '../Storage.js'
 const Profile = () => {
     const [active, setActive] = useState(0)
     const [user, setUser] = useState(null)
-    const [challenges, setChallenges] = useState([])
     const [fresh, setFresh] = useState(true)
 
 
-    const ChallengesView = ({challenges}) => {
+    const ChallengesView = ({fresh}) => {
+        const [challenges, setChallenges] = useState([])
+
+        useEffect(() => {
+            const fetchProfile = async () => {
+                try {
+                    const token = await retrieveSecret('authToken')
+                    console.log(`Token: ${token}`)
+                    const response = await fetch(
+                        'http://localhost:3000/profile',
+                        {
+                            method: 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                                authorization: `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                            }),
+                        }
+                    );
+                    const responseJson = await response.json();
+                    console.log(responseJson)
+                    setChallenges(responseJson.images)
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+            fetchProfile()
+        }, [fresh])
         // const challenges = [1,2,3,4,5,6,7]
         return (
             <View style={styles.challengeViewStyle}>
@@ -51,7 +79,7 @@ const Profile = () => {
                 const responseJson = await response.json();
                 console.log(responseJson)
                 setUser(responseJson.username)
-                setChallenges(responseJson.images)
+                // setChallenges(responseJson.images)
             } catch (error) {
                 console.error(error);
             }
@@ -72,7 +100,7 @@ const Profile = () => {
                 <View style={styles.bufferStyle}></View>
                 <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
                 <TabArea active={active}>
-                    <ChallengesView challenges={challenges}/>
+                    <ChallengesView fresh={fresh}/>
                     {/* <Text>2</Text> */}
                     {/* <Text>2</Text> */}
                     <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
