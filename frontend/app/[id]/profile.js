@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { shouldUseActivityState } from 'react-native-screens';
 import PhotoUpload from '../Components/PhotoUpload';
 import {retrieveSecret} from '../Storage.js'
-import {ChallengesView} from '../Components/Challenges.js'
+import {ChallengesView} from './Challenge/Challenge.js'
 
 
 const Profile = () => {
@@ -57,8 +57,6 @@ const Profile = () => {
                 <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
                 <TabArea active={active}>
                     <ChallengesView user={user} fresh={fresh}/>
-                    {/* <Text>2</Text> */}
-                    {/* <Text>2</Text> */}
                     <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
                 </TabArea>
             </View>

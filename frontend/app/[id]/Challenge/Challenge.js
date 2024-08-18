@@ -1,10 +1,14 @@
-import { View, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable, Button } from 'react-native';
 import { useEffect, useState } from 'react'
-import {retrieveSecret} from '../Storage.js'
+import {retrieveSecret} from '../../Storage.js'
+import { router, Link, useGlobalSearchParams } from 'expo-router';
 
 
 export const ChallengesView = ({user, fresh}) => {
     const [challenges, setChallenges] = useState([])
+    const localParams = useGlobalSearchParams()
+    console.log(`params: ${localParams.id}`)
+
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -33,16 +37,21 @@ export const ChallengesView = ({user, fresh}) => {
         }
         fetchProfile()
     }, [fresh])
-    // const challenges = [1,2,3,4,5,6,7]
     return (
         <View style={styles.challengeViewStyle}>
-            {/* {challenges.map((item, i) => <View key={i} style={styles.smallChallengeViewStyle}></View>)}                 */}
-            {challenges.map((item, i) => <Image 
-            key={`${user}-image-${i}`}
-            style={styles.smallChallengeImageStyle}
-            source={{
-                uri: `http://localhost:3000/${item.path}`,
-            }}></Image>)}                
+            {challenges.map((item, i) => 
+                <Pressable 
+                onPress={() => router.push(`${localParams.id}/${item.id}`)}
+                key={`${user}-image-${i}`}
+                >
+                    <Image 
+                        style={styles.smallChallengeImageStyle}
+                        source={{
+                            uri: `http://localhost:3000/${item.path}`,
+                        }}
+                    ></Image> 
+                </Pressable>
+            )}              
         </View>
     )
 }

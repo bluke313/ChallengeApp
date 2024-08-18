@@ -27,6 +27,12 @@ const RootLayout = () => {
                     headerShown: false,
                 }}
             />
+            <Stack.Screen
+                name="Challenge"
+                options={{
+                    headerShown: false,
+                }}
+            />
         </Stack>
     )
 };

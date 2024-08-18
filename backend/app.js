@@ -191,7 +191,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
     console.log(req.body)
 
     db.all(`
-        SELECT Images.path, Images.timestamp, Images.caption FROM Images 
+        SELECT Images.path, Images.timestamp, Images.caption, Images.id FROM Images 
         inner join Users 
         on Users.id = Images.userId 
         where Users.username = '${req.body.userId.userId}'
@@ -219,7 +219,8 @@ function formateImagePathsFromDBRows(rows){
         paths.push({
             "path": rows[i].path.slice(7), 
             "caption": rows[i].caption,
-            "timestamp": rows[i].timestamp
+            "timestamp": rows[i].timestamp,
+            "id": rows[i].id
         })
     }
 
@@ -262,6 +263,29 @@ router.route('/upload').post(async (req, res) => {
         res.send(req.file)
     })
 })
+
+router.route('/challenge/:challengeId').get(authenticateToken, async (req, res) => {
+    console.log(req.params)
+    if(isNaN(req.params.challengeId)){
+        res.sendStatus(500)
+        return
+    }
+    db.get(`SELECT path, timestamp, caption, id from Images where id = ${Number(req.params.challengeId)};`,
+        async (err, row) => {
+            if (err) {
+                error = err
+                console.log(error)
+                res.status(500).send({ "message": "Database error!", "success": false })
+                return
+            }
+
+            res.status(200).send(formateImagePathsFromDBRows([row])[0])
+            return
+        }
+    )
+
+})
+
 
 app.use(express.static('public'));
 
