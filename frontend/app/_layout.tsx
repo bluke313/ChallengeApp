@@ -1,8 +1,20 @@
-import { Stack } from "expo-router";
+import { Stack} from "expo-router";
 
 const RootLayout = () => {
     return (
         <Stack>
+            <Stack.Screen
+                name="index"
+                options={{
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name="SignUp"
+                options={{
+                    headerShown: false,
+                }}
+            />
             <Stack.Screen
                 name="Login"
                 options={{
@@ -10,25 +22,19 @@ const RootLayout = () => {
                 }}
             />
             <Stack.Screen
-                name='SignUp'
+                name="p"
                 options={{
-                    headerTitle: '',
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name="i"
+                options={{
+                    headerShown: false,
                 }}
             />
             <Stack.Screen
                 name="home"
-                options={{
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name="[id]"
-                options={{
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name="Challenge"
                 options={{
                     headerShown: false,
                 }}

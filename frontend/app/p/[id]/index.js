@@ -1,12 +1,12 @@
 import { View, Text, StyleSheet, Pressable, ScrollView, Image } from 'react-native';
-import IndicatorButton from '../Components/Button';
-import UserIcon from '../Components/Icons';
-import TabSelect, { TabArea } from '../Components/Tabs';
+import IndicatorButton from '../../Components/Button.js';
+import UserIcon from '../../Components/Icons.js';
+import TabSelect, { TabArea } from '../../Components/Tabs.js';
 import { useEffect, useState } from 'react'
 import { shouldUseActivityState } from 'react-native-screens';
-import PhotoUpload from '../Components/PhotoUpload';
-import {retrieveSecret} from '../Storage.js'
-import {ChallengesView} from './Challenge/Challenge.js'
+import PhotoUpload from '../../Components/PhotoUpload.js';
+import {retrieveSecret} from '../../Storage.js'
+// import {ChallengesView} from '../../[id]/Challenge/Challenge.js'
 
 
 const Profile = () => {
@@ -56,7 +56,7 @@ const Profile = () => {
                 <View style={styles.bufferStyle}></View>
                 <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
                 <TabArea active={active}>
-                    <ChallengesView user={user} fresh={fresh}/>
+                    {/* <ChallengesView user={user} fresh={fresh}/> */}
                     <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
                 </TabArea>
             </View>

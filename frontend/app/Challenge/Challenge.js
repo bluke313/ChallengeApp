@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, Pressable, Button } from 'react-native';
 import { useEffect, useState } from 'react'
-import {retrieveSecret} from '../../Storage.js'
+import {retrieveSecret} from '../Storage.js'
 import { router, Link, useGlobalSearchParams } from 'expo-router';
 
 

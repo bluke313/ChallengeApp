@@ -35,7 +35,7 @@ const Login = (props) => {
             console.log(responseJson)
             if (responseJson.success) {
                 await storeSecret('authToken', responseJson.token)
-                router.push(`/${responseJson.username}/home`);
+                router.push(`/home`);
             }
             // BELOW IS AN ATTEMPT TO MAKE LOGIN ATTEMPTS WITH NEW EMAILS SEND YOU TO SIGNUP WITH THE EMAIL ALREADY ENTERED
             // else if (responseJson.errCode === 1) {

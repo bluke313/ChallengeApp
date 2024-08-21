@@ -1,8 +1,16 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
-import { dropSecret } from '../Storage.js';
+import { dropSecret } from './Storage.js';
+import { useState, useEffect } from 'react';
 
 const home = () => {
+
+    const [username, setUsername] = useState('');
+
+    useEffect( () => {
+        setUsername('test');
+    }, []);
+
     return (
         <View>
             <Text style={styles.title}>Home Page</Text>
@@ -13,8 +21,11 @@ const home = () => {
             <Text style={styles.buttonText}>Sign Out
             </Text>
             </Pressable>
+            <Pressable
+                onPress={() => {router.push(`/${userId}`)}}
+            >GO TO PROFILE</Pressable>
         </View>
-    )
+    );
 };
 
 const styles = StyleSheet.create({

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, component } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
 import {storeSecret} from './Storage.js'
 
@@ -16,7 +16,6 @@ const SignUp = (props) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const handleLogin = async () => {
-        console.log("hi")
         try {
             const response = await fetch(
                 'http://localhost:3000/signup',
@@ -37,10 +36,11 @@ const SignUp = (props) => {
             console.log(responseJson)
             if (responseJson.success) {
                 // props.handleLogin(responseJson.username);
-                await storeSecret('authToken', responseJson.token)
+                await storeSecret('authToken', responseJson.token);
+                router.push(`/home`);
             }
             else {
-                setErrorMsg(responseJson.message)
+                setErrorMsg(responseJson.message);
             }
         } catch (error) {
             console.error(error);
