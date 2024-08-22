@@ -2,13 +2,40 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { dropSecret } from './Storage.js';
 import { useState, useEffect } from 'react';
+import {retrieveSecret} from './Storage.js'
+
 
 const home = () => {
 
     const [username, setUsername] = useState('');
 
     useEffect( () => {
-        setUsername('test');
+        // setUsername('test');
+
+        const fetchHome = async () => {
+            try {
+                const token = await retrieveSecret('authToken')
+                console.log(`Token: ${token}`)
+                const response = await fetch(
+                    'http://localhost:3000/home',
+                    {
+                        method: 'GET',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                            authorization: `Bearer ${token}`
+                        },
+                    }
+                );
+                const responseJson = await response.json();
+                console.log(responseJson)
+                setUsername(responseJson.username)
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchHome()
+
     }, []);
 
     return (
@@ -22,7 +49,7 @@ const home = () => {
             </Text>
             </Pressable>
             <Pressable
-                onPress={() => {router.push(`/${userId}`)}}
+                onPress={() => {router.push(`/p/${username}`)}}
             >GO TO PROFILE</Pressable>
         </View>
     );

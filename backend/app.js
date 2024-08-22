@@ -77,7 +77,8 @@ router.route('/').get((req, res) => {
 
 //TODO work in user id?? if needed idk if it needs to be in the endpoint url or not
 router.route('/home').get(authenticateToken, (req, res) => {
-    res.send("You should only see this with a valid token")
+    console.log(req.body.userId.userId)
+    res.send({"Message":"You should only see this with a valid token", "username": req.body.userId.userId})
 })
 
 
