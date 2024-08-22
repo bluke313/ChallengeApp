@@ -205,12 +205,20 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                 return
             }
             const imagePaths = formateImagePathsFromDBRows(row)
-            res.status(200).send({"username": req.body.userId.userId, "images": imagePaths})
+
+            db.get(`select bio from Users where username = '${req.body.userId.userId}';`, async (err, row) => {
+                if (err) {
+                    error = err
+                    console.log(error)
+                    res.status(500).send({ "message": "Database error!", "success": false })
+                    return
+                }
+                console.log(row)
+                res.status(200).send({"username": req.body.userId.userId, "bio": row.bio, "images": imagePaths})
+                return
+            })
             return
         })
-
-        // res.sendStatus(500)
-
 })
 
 function formateImagePathsFromDBRows(rows){
@@ -284,6 +292,13 @@ router.route('/challenge/:challengeId').get(authenticateToken, async (req, res) 
             return
         }
     )
+
+})
+
+router.route('/savebio').post(authenticateToken, async (req, res) => {
+    console.log(req.body)
+    db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
+    res.status(200).send({"message": "Bio updated"})
 
 })
 
