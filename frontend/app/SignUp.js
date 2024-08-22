@@ -57,9 +57,12 @@ const SignUp = (props) => {
         }        
     };
 
-    const handleKeyPress = (event) => {
-        if (event.nativeEvent.key === 'Enter') {
-            handleLogin();
+    const handleKeyPress = (e) => {
+        if (e.nativeEvent.key === 'Enter') {
+            e.preventDefault();
+            if (allowSignUp) {
+                handleLogin();
+            }
         }
     };
 
@@ -76,12 +79,15 @@ const SignUp = (props) => {
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
+                onKeyPress={handleKeyPress}
             />
             <TextInput
                 style={styles.input}
                 placeholder="Username"
                 value={username}
                 onChangeText={setUsername}
+                onKeyPress={handleKeyPress}
+
             />
             <View style={styles.password}>
                 <TextInput

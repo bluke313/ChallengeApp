@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import { router, Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage.js';
-import {storeSecret} from './Storage.js'
+import { storeSecret } from './Storage.js'
 
 const Login = (props) => {
 
@@ -59,7 +59,7 @@ const Login = (props) => {
         }
         else {
             setAllowLogin(false);
-        }        
+        }
     };
 
     // const checkEmail = () => {
@@ -80,9 +80,12 @@ const Login = (props) => {
     //     }
     // };
 
-    const handleKeyPress = (event) => {
-        if (event.nativeEvent.key === 'Enter') {
-            handleLogin();
+    const handleKeyPress = (e) => {
+        if (e.nativeEvent.key === 'Enter') {
+            e.preventDefault();
+            if (allowLogin) {
+                handleLogin();
+            }
         }
     };
 
@@ -99,6 +102,7 @@ const Login = (props) => {
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
+                onKeyPress={handleKeyPress}
             />
             <View style={styles.password}>
                 <TextInput
