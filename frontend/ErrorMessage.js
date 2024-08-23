@@ -8,8 +8,8 @@ const ErrorMessage = ({msg}) => {
     }
     return (
         <Text style={styles.errorMsgText}>{msg}</Text>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -55,4 +55,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ErrorMessage
+export default ErrorMessage;

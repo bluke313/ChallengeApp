@@ -273,26 +273,23 @@ router.route('/upload').post(async (req, res) => {
     })
 })
 
-router.route('/challenge/:challengeId').get(authenticateToken, async (req, res) => {
+router.route('/i/:challengeId').get(authenticateToken, async (req, res) => {
     console.log(req.params)
     if(isNaN(req.params.challengeId)){
         res.sendStatus(500)
         return
     }
-    db.get(`SELECT path, timestamp, caption, id from Images where id = ${Number(req.params.challengeId)};`,
+    db.get(`SELECT path, timestamp, caption, id FROM Images WHERE id = ${Number(req.params.challengeId)};`,
         async (err, row) => {
             if (err) {
-                error = err
-                console.log(error)
-                res.status(500).send({ "message": "Database error!", "success": false })
-                return
+                console.log(err);
+                res.status(500).send({ "message": "Database error!", "success": false });
             }
-
-            res.status(200).send(formateImagePathsFromDBRows([row])[0])
-            return
+            else {
+                res.status(200).send(formateImagePathsFromDBRows([row])[0]);
+            }
         }
     )
-
 })
 
 router.route('/savebio').post(authenticateToken, async (req, res) => {
@@ -300,6 +297,20 @@ router.route('/savebio').post(authenticateToken, async (req, res) => {
     db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
     res.status(200).send({"message": "Bio updated"})
 
+})
+
+router.route('/feed').post(async (req, res) => {
+    // currentUserId = req.userId
+    // db.get(`SELECT path, timestamp, caption, id FROM Images WHERE userId IN (SELECT friendId FROM Friends WHERE userID = :currentUserId)`)
+    db.get(`SELECT path, timestamp, caption, id FROM Images`, async (err, row) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send({ 'message': 'Database error!', 'success': false });
+        }
+        else {
+            res.status(200).send(formateImagePathsFromDBRows([row])[0]);
+        }
+    })
 })
 
 

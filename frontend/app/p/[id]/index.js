@@ -19,6 +19,7 @@ const Profile = () => {
     const bioRef = useRef(null)
     const scrollViewRef = useRef(null);
 
+    // Reset user view to top of screen
     const scrollToTop = () => {
         if (scrollViewRef.current) {
             scrollViewRef.current.scrollTo({ y: 0, animated: true});
@@ -103,6 +104,7 @@ const Profile = () => {
 
     return (
         <View style={styles.container}>
+
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <View style={styles.topView}>
                     <Text style={styles.title}>Profile page</Text>
@@ -120,6 +122,7 @@ const Profile = () => {
                     </TabArea>
                 </View>
             </ScrollView>
+
             <View style={styles.tabs}>
                 <Pressable
                     onPress={() => { router.push(`/home`) }}
@@ -134,6 +137,7 @@ const Profile = () => {
                     <Text style={styles.buttonText} >{`\u{1F9D1}`}</Text>
                 </Pressable>
             </View>
+
         </View>
     );
 };

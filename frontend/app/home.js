@@ -1,14 +1,14 @@
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
-import { dropSecret } from './Storage.js';
+import { dropSecret, retrieveSecret } from './Storage.js';
+import { Feed } from '../assets/assets.js';
 import { useState, useEffect, useRef } from 'react';
-import { retrieveSecret } from './Storage.js'
-
 
 const home = () => {
     const [username, setUsername] = useState('');
     const scrollViewRef = useRef(null);
 
+    // Reset user view to top of screen
     const scrollToTop = () => {
         if (scrollViewRef.current) {
             scrollViewRef.current.scrollTo({ y: 0, animated: true });
@@ -46,6 +46,7 @@ const home = () => {
 
     return (
         <View style={styles.container}>
+            
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <Text style={styles.title}>Home Page</Text>
                 <Pressable
@@ -54,8 +55,10 @@ const home = () => {
                 >
                     <Text style={styles.buttonText}>Sign Out</Text>
                 </Pressable>
+                <Feed></Feed>
                 <Text style={ {fontSize: 50, width: 20, alignSelf: 'center'} }>abcdefghijklmnopqrstuvwxyz</Text>
             </ScrollView>
+
             <View style={styles.tabs}>
                 <Pressable
                     onPress={scrollToTop}
@@ -70,6 +73,7 @@ const home = () => {
                     <Text style={styles.buttonText} >{`\u{1F9D1}`}</Text>
                 </Pressable>
             </View>
+
         </View>
     );
 };

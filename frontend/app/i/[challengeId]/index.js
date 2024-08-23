@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, Image, Pressable, Button } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useEffect, useState } from 'react'
 import { retrieveSecret } from '../../Storage.js'
-import { router, Link, useGlobalSearchParams } from 'expo-router';
-
+import { router, useGlobalSearchParams } from 'expo-router';
 
 export default function Challenge({ challenge }) {
     const [photoData, setPhotoData] = useState(null)
@@ -11,12 +10,13 @@ export default function Challenge({ challenge }) {
     //consider a useEffect that calls /challenge which would serve comments, likes, etc
 
     useEffect(() => {
+
         const retrieveFullChallenge = async () => {
             try {
                 const token = await retrieveSecret('authToken')
-                console.log(`Token: ${token}`)
+                // console.log(`Token: ${token}`)
                 const response = await fetch(
-                    `http://localhost:3000/challenge/${searchParams.challengeId}`,
+                    `http://localhost:3000/i/${searchParams.challengeId}`,
                     {
                         method: 'GET',
                         headers: {
@@ -27,9 +27,10 @@ export default function Challenge({ challenge }) {
                     }
                 );
                 const responseJson = await response.json();
-                console.log(responseJson)
+                // console.log(responseJson)
                 setPhotoData(responseJson)
                 // setChallenges(responseJson.images)
+                // console.log(`Found File Data: ${photoData}`);
             } catch (error) {
                 console.error(error);
             }
@@ -38,22 +39,76 @@ export default function Challenge({ challenge }) {
     }, [])
 
     return (
-        <View>
-            {photoData == null ? null : <Image
-                style={styles.challengeImageStyle}
-                source={{
-                    uri: `http://localhost:3000/${photoData.path}`,
-                }}
-            ></Image>}
-            <Button onPress={() => router.back()}>Go Back</Button>
+        <View style={styles.container}>
+            <Pressable style={styles.returnButton} onPress={ () => router.back() }>
+                <Text style={styles.buttonText}>Return</Text>
+            </Pressable>
+            {photoData == null ? <Text style={styles.errorText}>IMAGE NOT FOUND</Text> :
+                <View style={styles.imageContainer}>
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `http://localhost:3000/${photoData.path}`,
+                        }}
+                    />
+                    <Text style={styles.caption}>{photoData.caption == null ? null : photoData.caption}</Text>
+                    <Text style={styles.timestamp}>Uploaded {photoData.timestamp}</Text>
+                </View>}
+            {/* <Pressable style={styles.button} onPress={ () => { console.log(photoData)}}><Text style={styles.buttonText}>test</Text></Pressable> */}
         </View>
     )
 
 }
 
 const styles = StyleSheet.create({
-    challengeImageStyle: {
+    container: {
+        alignItems: 'center',
+    },
+    imageContainer: {
+        borderWidth: 5,
+        borderColor: '#007BFF',
+        backgroundColor: 'lightblue',
+        marginTop: 100,
+        alignItems: 'center',
+    },
+    image: {
         width: 350,
-        height: 400
-    }
+        height: 400,
+        borderWidth: 2,
+        borderColor: '#007BFF',
+        backgroundColor: 'white',
+    },
+    caption: {
+        fontFamily: 'sans-serif',
+        marginTop: 3,
+    },
+    timestamp: {
+        fontFamily: 'sans-serif',
+        marginBottom: 3,
+    },
+    returnButton: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        margin: 20,
+    },
+    button: {
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 50,
+        marginTop: 50,
+    },  
 })
