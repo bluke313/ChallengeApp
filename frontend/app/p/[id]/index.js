@@ -1,13 +1,15 @@
 import { View, TextInput, Text, StyleSheet, Pressable, ScrollView, Image } from 'react-native';
+import { useEffect, useRef, useState } from 'react'
+import { router } from 'expo-router';
+import { shouldUseActivityState } from 'react-native-screens';
+
+
 import IndicatorButton from '../../Components/Button.js';
 import UserIcon from '../../Components/Icons.js';
 import TabSelect, { TabArea } from '../../Components/Tabs.js';
-import { useEffect, useRef, useState } from 'react'
-import { shouldUseActivityState } from 'react-native-screens';
 import PhotoUpload from '../../Components/PhotoUpload.js';
-import {retrieveSecret} from '../../Storage.js'
-import {ChallengesView} from '../../Challenge/Challenge.js'
-
+import { retrieveSecret } from '../../Storage.js'
+import { ChallengesView } from '../../Challenge/Challenge.js'
 
 const Profile = () => {
     const [active, setActive] = useState(0)
@@ -15,6 +17,13 @@ const Profile = () => {
     const [bio, setBio] = useState(null)
     const [fresh, setFresh] = useState(true)
     const bioRef = useRef(null)
+    const scrollViewRef = useRef(null);
+
+    const scrollToTop = () => {
+        if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: 0, animated: true});
+        }
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -86,28 +95,44 @@ const Profile = () => {
                     }
                     saveBio()
                 }} style={styles.addBioButton}>
-                    <Text style={{color: "white"}}>Add</Text>
+                    <Text style={{ color: "white" }}>Add</Text>
                 </Pressable>
             </View>
         )
     }
 
     return (
-        <View style={styles.mainView}>
-            <View style={styles.topView}>
-                <Text style={styles.title}>Profile page</Text>
-                <UserIcon style={styles.userIconPosition} />
-            </View>
-            <View style={styles.infoView}>
-                <Text style={styles.header1}>{user ? user : "loading"}</Text>
-                {bio == null && user != null ? <AddBio /> : <Text style={styles.bio}>{bio ? bio : "loading"}</Text>}
-                <IndicatorButton>13 Group Mates</IndicatorButton>
-                <View style={styles.bufferStyle}></View>
-                <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
-                <TabArea active={active}>
-                    <ChallengesView user={user} fresh={fresh}/>
-                    <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
-                </TabArea>
+        <View style={styles.container}>
+            <ScrollView ref={scrollViewRef} style={styles.content}>
+                <View style={styles.topView}>
+                    <Text style={styles.title}>Profile page</Text>
+                    <UserIcon style={styles.userIconPosition} />
+                </View>
+                <View style={styles.infoView}>
+                    <Text style={styles.header1}>{user ? user : "loading"}</Text>
+                    {bio == null && user != null ? <AddBio /> : <Text style={styles.bio}>{bio ? bio : "loading"}</Text>}
+                    <IndicatorButton>13 Group Mates</IndicatorButton>
+                    <View style={styles.bufferStyle}></View>
+                    <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
+                    <TabArea active={active}>
+                        <ChallengesView user={user} fresh={fresh} />
+                        <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
+                    </TabArea>
+                </View>
+            </ScrollView>
+            <View style={styles.tabs}>
+                <Pressable
+                    onPress={() => { router.push(`/home`) }}
+                    style={styles.tabButton}
+                >
+                    <Text style={styles.buttonText} >{`\u{1F3E0}`}</Text>
+                </Pressable>
+                <Pressable
+                    onPress={scrollToTop}
+                    style={styles.tabButton}
+                >
+                    <Text style={styles.buttonText} >{`\u{1F9D1}`}</Text>
+                </Pressable>
             </View>
         </View>
     );
@@ -140,9 +165,6 @@ const styles = StyleSheet.create({
         height: '25%',
         padding: 30
     },
-    mainView: {
-        height: "100vh",
-    },
     infoView: {
         padding: 16,
     },
@@ -169,6 +191,44 @@ const styles = StyleSheet.create({
         padding: 8,
         height: 40,
         borderRadius: "0.375rem"
+    },
+    button: {
+        backgroundColor: '#007BFF',
+        padding: 10,
+        alignItems: 'center',
+        alignSelf: 'center',
+        borderRadius: 5,
+        minWidth: 100,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'flex-start',
+        // height: '100vh', REMOVED
+    },
+    content: {
+        flex: 1,
+    },
+    tabs: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        padding: 10,
+        backgroundColor: 'lightblue',
+    },
+    tabButton: {
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginHorizontal: 5,
+        width: 100,
     }
 });
 
