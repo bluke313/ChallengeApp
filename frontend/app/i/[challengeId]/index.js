@@ -40,21 +40,40 @@ export default function Challenge({ challenge }) {
 
     return (
         <View style={styles.container}>
-            <Pressable style={styles.returnButton} onPress={ () => router.back() }>
-                <Text style={styles.buttonText}>Return</Text>
-            </Pressable>
-            {photoData == null ? <Text style={styles.errorText}>IMAGE NOT FOUND</Text> :
-                <View style={styles.imageContainer}>
-                    <Image
-                        style={styles.image}
-                        source={{
-                            uri: `http://localhost:3000/${photoData.path}`,
-                        }}
-                    />
-                    <Text style={styles.caption}>{photoData.caption == null ? null : photoData.caption}</Text>
-                    <Text style={styles.timestamp}>Uploaded {photoData.timestamp}</Text>
-                </View>}
-            {/* <Pressable style={styles.button} onPress={ () => { console.log(photoData)}}><Text style={styles.buttonText}>test</Text></Pressable> */}
+
+            <View style={styles.content}>
+                <Pressable style={styles.returnButton} onPress={() => router.back()}>
+                    <Text style={styles.buttonText}>Return</Text>
+                </Pressable>
+                {photoData == null ? <Text style={styles.errorText}>IMAGE NOT FOUND</Text> :
+                    <View style={styles.imageContainer}>
+                        <Image
+                            style={styles.image}
+                            source={{
+                                uri: `http://localhost:3000/${photoData.path}`,
+                            }}
+                        />
+                        <Text style={styles.caption}>{photoData.caption == null ? null : photoData.caption}</Text>
+                        <Text style={styles.timestamp}>Uploaded {photoData.timestamp}</Text>
+                    </View>}
+                {/* <Pressable style={styles.button} onPress={ () => { console.log(photoData)}}><Text style={styles.buttonText}>test</Text></Pressable> */}
+            </View>
+
+            {/* <View style={styles.tabs}>            ATTEMPT TO ADD TABS TO IMAGE VIEWING SCREEN. KNOWN BUGS
+                <Pressable
+                    onPress={() => { router.push(`/home`) }}
+                    style={styles.tabButton}
+                >
+                    <Text style={styles.buttonText} >{`\u{1F3E0}`}</Text>
+                </Pressable>
+                <Pressable
+                    onPress={() => { router.push(`/p/${username}`) }}
+                    style={styles.tabButton}
+                >
+                    <Text style={styles.buttonText} >{`\u{1F9D1}`}</Text>
+                </Pressable>
+            </View> */}
+
         </View>
     )
 
@@ -110,5 +129,28 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 50,
         marginTop: 50,
-    },  
+    },
+    content: {
+        flex: 1,
+        padding: 16,
+        alignContent: 'center',
+    },
+    tabs: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        padding: 10,
+        backgroundColor: 'lightblue',
+    },
+    tabButton: {
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginHorizontal: 5,
+        width: 100,
+    }
 })

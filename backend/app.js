@@ -31,11 +31,11 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({storage: storage}).single('file') //Tbh idk what this does
+const upload = multer({ storage: storage }).single('file') //Tbh idk what this does
 
 function imageToBytes(filePath) {
     const data = fs.readFileSync(filePath).toString('binary')
-    console.log(data)
+    // console.log(data)
 }
 
 function savePhoto(data, userId, uploadDate) {
@@ -50,18 +50,18 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
     if (token == null) return res.sendStatus(401)
-  
-    console.log(authHeader)
+
+    // console.log(authHeader)
     jwt.verify(token, "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi", (err, userId) => {
-      console.log(err)
-  
-      if (err) return res.sendStatus(403)
-  
-      req.body.userId = userId
-  
-      next()
+        // console.log(`Authenticate token ERROR: ${err}`);
+
+        if (err) return res.sendStatus(403)
+
+        req.body.userId = userId;
+
+        next();
     })
-  }
+}
 
 router.route('/').get((req, res) => {
     res.send("hello world on router")
@@ -77,28 +77,26 @@ router.route('/').get((req, res) => {
 
 //TODO work in user id?? if needed idk if it needs to be in the endpoint url or not
 router.route('/home').get(authenticateToken, (req, res) => {
-    console.log(req.body.userId.userId)
-    res.send({"Message":"You should only see this with a valid token", "username": req.body.userId.userId})
+    // console.log(req.body.userId.userId)
+    res.send({ "Message": "You should only see this with a valid token", "username": req.body.userId.userId })
 })
 
 
 //TODO cleanup
 router.route('/signup').post(async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
 
     //checks for email uniqueness
     db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, async (err, row) => {
         if (err) { //db error
-            error = err
-            console.log(error)
+            console.log(`/signup ERROR: ${err}`);
             res.status(500).send({ "message": "Database error!", "success": false })
             return
         }
         if (!row) { //email is unique now check username
             db.get(`SELECT * FROM Users WHERE username = '${req.body.username}'`, async (err, row) => {
                 if (err) { //db error
-                    error = err
-                    console.log(error)
+                    console.log(`/signupError: ${err}`);
                     res.status(500).send({ "message": "Database error!", "success": false })
                     return
                 }
@@ -120,7 +118,7 @@ router.route('/signup').post(async (req, res) => {
                             { expiresIn: "1h" }
                         );
                     } catch (err) {
-                        console.log(err);
+                        console.log(`/signupError: ${err}`);
                         res.status(400).send({ "message": err, "success": false, "username": req.body.username })
                         return;
                     }
@@ -146,13 +144,12 @@ router.route('/signup').post(async (req, res) => {
 
 router.route('/login').post(async (req, res) => {
     //add to db
-    console.log(req.body)
+    // console.log(req.body)
     let error = null
     let password = null
     db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, async (err, row) => {
         if (err) {
-            error = err
-            console.log(error)
+            console.log(`/login ERROR: ${err}`);
             res.status(500).send({ "message": "Database error!", "success": false })
             return
         }
@@ -174,7 +171,7 @@ router.route('/login').post(async (req, res) => {
                     { expiresIn: "1h" }
                 );
             } catch (err) {
-                console.log(err);
+                console.log(`/login ERROR: ${err}`);
                 res.status(400).send({ "message": err, "success": false, "username": row.username })
                 return;
             }
@@ -189,7 +186,7 @@ router.route('/login').post(async (req, res) => {
 })
 
 router.route('/profile').post(authenticateToken, async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
 
     db.all(`
         SELECT Images.path, Images.timestamp, Images.caption, Images.id FROM Images 
@@ -198,35 +195,33 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
         where Users.username = '${req.body.userId.userId}'
         order by Images.timestamp;
         `, async (err, row) => {
+        if (err) {
+            console.log(`/profile ERROR: ${err}`);
+            res.status(500).send({ "message": "Database error!", "success": false })
+            return
+        }
+        const imagePaths = formateImagePathsFromDBRows(row)
+
+        db.get(`select bio from Users where username = '${req.body.userId.userId}';`, async (err, row) => {
             if (err) {
-                error = err
-                console.log(error)
+                console.log(`/profile ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false })
                 return
             }
-            const imagePaths = formateImagePathsFromDBRows(row)
-
-            db.get(`select bio from Users where username = '${req.body.userId.userId}';`, async (err, row) => {
-                if (err) {
-                    error = err
-                    console.log(error)
-                    res.status(500).send({ "message": "Database error!", "success": false })
-                    return
-                }
-                console.log(row)
-                res.status(200).send({"username": req.body.userId.userId, "bio": row.bio, "images": imagePaths})
-                return
-            })
+            // console.log(row)
+            res.status(200).send({ "username": req.body.userId.userId, "bio": row.bio, "images": imagePaths })
             return
         })
+        return
+    })
 })
 
-function formateImagePathsFromDBRows(rows){
+function formateImagePathsFromDBRows(rows) {
     let paths = []
-
-    for(let i = 0; i < rows.length; i++){
+    console.log('Forming image paths from DB rows...');
+    for (let i = 0; i < rows.length; i++) {
         paths.push({
-            "path": rows[i].path.slice(7), 
+            "path": rows[i].path.slice(7),
             "caption": rows[i].caption,
             "timestamp": rows[i].timestamp,
             "id": rows[i].id
@@ -250,19 +245,18 @@ function getDateTimeForDB() {
 router.route('/upload').post(async (req, res) => {
     upload(req, res, (err) => { //initiates the storage function for the photo
         if (err) {
-            console.log(err)
+            console.log(`/upload ERROR: ${err}`);
             res.sendStatus(500)
         }
         const username = JSON.parse(req.body.body).username
         const caption = JSON.parse(req.body.body).caption
         const filePath = req.file.path
         const timestamp = getDateTimeForDB()
-        console.log(timestamp)
+        // console.log(timestamp)
 
         db.get(`SELECT id FROM Users WHERE username = '${username}'`, async (err, row) => {
             if (err) {
-                error = err
-                console.log(error)
+                console.log(`/upload ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false })
                 return
             }
@@ -274,15 +268,15 @@ router.route('/upload').post(async (req, res) => {
 })
 
 router.route('/i/:challengeId').get(authenticateToken, async (req, res) => {
-    console.log(req.params)
-    if(isNaN(req.params.challengeId)){
+    // console.log(req.params)
+    if (isNaN(req.params.challengeId)) {
         res.sendStatus(500)
         return
     }
     db.get(`SELECT path, timestamp, caption, id FROM Images WHERE id = ${Number(req.params.challengeId)};`,
         async (err, row) => {
             if (err) {
-                console.log(err);
+                console.log(`/i/[challengeId] ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false });
             }
             else {
@@ -293,24 +287,27 @@ router.route('/i/:challengeId').get(authenticateToken, async (req, res) => {
 })
 
 router.route('/savebio').post(authenticateToken, async (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
-    res.status(200).send({"message": "Bio updated"})
+    res.status(200).send({ "message": "Bio updated" })
 
 })
 
-router.route('/feed').post(async (req, res) => {
+router.route('/feed').get(async (req, res) => {
     // currentUserId = req.userId
     // db.get(`SELECT path, timestamp, caption, id FROM Images WHERE userId IN (SELECT friendId FROM Friends WHERE userID = :currentUserId)`)
-    db.get(`SELECT path, timestamp, caption, id FROM Images`, async (err, row) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send({ 'message': 'Database error!', 'success': false });
-        }
-        else {
-            res.status(200).send(formateImagePathsFromDBRows([row])[0]);
-        }
-    })
+    console.log('Getting feed...');
+    db.get(`SELECT path, timestamp, caption, id FROM Images WHERE id = 12`,
+        async (err, row) => {
+            if (err) {
+                console.log(`/feed ERROR: ${err}`);
+                res.status(500).send({ 'message': 'Database error!', 'success': false });
+            }
+            else {
+                // console.log(row);
+                res.status(200).send(formateImagePathsFromDBRows([row])[0]);
+            }
+        })
 })
 
 
@@ -318,5 +315,5 @@ app.use(express.static('public'));
 
 
 app.listen(port, () => {
-    console.log('Listening on port ' + port)
+    console.log(`Listening on port ${port}...`)
 })

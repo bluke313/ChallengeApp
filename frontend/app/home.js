@@ -36,8 +36,8 @@ const home = () => {
                 const responseJson = await response.json();
                 console.log(responseJson)
                 setUsername(responseJson.username)
-            } catch (error) {
-                console.error(error);
+            } catch (err) {
+                console.error(err);
             }
         }
         fetchHome()
@@ -46,7 +46,7 @@ const home = () => {
 
     return (
         <View style={styles.container}>
-            
+
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <Text style={styles.title}>Home Page</Text>
                 <Pressable
@@ -55,8 +55,8 @@ const home = () => {
                 >
                     <Text style={styles.buttonText}>Sign Out</Text>
                 </Pressable>
-                <Feed></Feed>
-                <Text style={ {fontSize: 50, width: 20, alignSelf: 'center'} }>abcdefghijklmnopqrstuvwxyz</Text>
+                <Feed user={username} />
+                <Text style={{ fontSize: 50, width: 20, alignSelf: 'center' }}>abcdefghijklmnopqrstuvwxyz</Text>
             </ScrollView>
 
             <View style={styles.tabs}>
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         padding: 16,
+        alignContent: 'center',
     },
     tabs: {
         position: 'absolute',
