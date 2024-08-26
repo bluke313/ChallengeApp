@@ -7,7 +7,7 @@ import { router, Link, useGlobalSearchParams } from 'expo-router';
 export const ChallengesView = ({user, fresh}) => {
     const [challenges, setChallenges] = useState([])
     const localParams = useGlobalSearchParams()
-    console.log(`params: ${localParams.id}`)
+    // console.log(`params: ${localParams.id}`)
 
 
     useEffect(() => {
@@ -25,6 +25,7 @@ export const ChallengesView = ({user, fresh}) => {
                             authorization: `Bearer ${token}`
                         },
                         body: JSON.stringify({
+                            "pageUserName": user
                         }),
                     }
                 );

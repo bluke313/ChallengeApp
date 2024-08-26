@@ -1,6 +1,6 @@
 import { View, TextInput, Text, StyleSheet, Pressable, ScrollView, Image } from 'react-native';
 import { useEffect, useRef, useState } from 'react'
-import { router } from 'expo-router';
+import { router, useGlobalSearchParams } from 'expo-router';
 import { shouldUseActivityState } from 'react-native-screens';
 
 
@@ -16,8 +16,11 @@ const Profile = () => {
     const [user, setUser] = useState(null)
     const [bio, setBio] = useState(null)
     const [fresh, setFresh] = useState(true)
+    const [ownPage, setOwnPage] = useState(false)
     const bioRef = useRef(null)
     const scrollViewRef = useRef(null);
+
+    const glob = useGlobalSearchParams();
 
     // Reset user view to top of screen
     const scrollToTop = () => {
@@ -41,6 +44,7 @@ const Profile = () => {
                             authorization: `Bearer ${token}`
                         },
                         body: JSON.stringify({
+                            "pageUserName": glob.id
                         }),
                     }
                 );
@@ -48,6 +52,7 @@ const Profile = () => {
                 console.log(responseJson)
                 setUser(responseJson.username)
                 setBio(responseJson.bio)
+                setOwnPage(responseJson.ownProfile)
                 // setChallenges(responseJson.images)
             } catch (error) {
                 console.error(error);
@@ -102,6 +107,26 @@ const Profile = () => {
         )
     }
 
+    const ProfileData = () => {
+        if(!ownPage){
+            return (
+                <View>
+                    <ChallengesView user={glob.id} fresh={fresh} />
+                </View>
+            )
+        }
+
+        return (
+            <View>
+                <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
+                <TabArea active={active}>
+                    <ChallengesView user={user} fresh={fresh} />
+                    <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
+                </TabArea>
+            </View>
+        )
+    }
+
     return (
         <View style={styles.container}>
 
@@ -111,15 +136,11 @@ const Profile = () => {
                     <UserIcon style={styles.userIconPosition} />
                 </View>
                 <View style={styles.infoView}>
-                    <Text style={styles.header1}>{user ? user : "loading"}</Text>
-                    {bio == null && user != null ? <AddBio /> : <Text style={styles.bio}>{bio ? bio : "loading"}</Text>}
+                    <Text style={styles.header1}>{glob.id}</Text>
+                    {bio == null && ownPage ? <AddBio /> : bio == null ? null : <Text style={styles.bio}>{bio}</Text>}
                     <IndicatorButton>13 Group Mates</IndicatorButton>
                     <View style={styles.bufferStyle}></View>
-                    <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
-                    <TabArea active={active}>
-                        <ChallengesView user={user} fresh={fresh} />
-                        <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
-                    </TabArea>
+                    <ProfileData/>
                 </View>
             </ScrollView>
 

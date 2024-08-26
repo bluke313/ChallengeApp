@@ -188,11 +188,13 @@ router.route('/login').post(async (req, res) => {
 router.route('/profile').post(authenticateToken, async (req, res) => {
     // console.log(req.body)
 
+    console.log(req.body)
+
     db.all(`
         SELECT Images.path, Images.timestamp, Images.caption, Images.id FROM Images 
         inner join Users 
         on Users.id = Images.userId 
-        where Users.username = '${req.body.userId.userId}'
+        where Users.username = '${req.body.pageUserName}'
         order by Images.timestamp;
         `, async (err, row) => {
         if (err) {
@@ -202,14 +204,14 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
         }
         const imagePaths = formateImagePathsFromDBRows(row)
 
-        db.get(`select bio from Users where username = '${req.body.userId.userId}';`, async (err, row) => {
+        db.get(`select bio from Users where username = '${req.body.pageUserName}';`, async (err, row) => {
             if (err) {
                 console.log(`/profile ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false })
                 return
             }
             // console.log(row)
-            res.status(200).send({ "username": req.body.userId.userId, "bio": row.bio, "images": imagePaths })
+            res.status(200).send({ "username": req.body.userId.userId, "bio": row ? row.bio : null, "images": imagePaths, "ownProfile": req.body.pageUserName === req.body.userId.userId })
             return
         })
         return
@@ -218,7 +220,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
 
 function formateImagePathsFromDBRows(rows) {
     let paths = []
-    console.log('Forming image paths from DB rows...');
+    // console.log('Forming image paths from DB rows...');
     for (let i = 0; i < rows.length; i++) {
         paths.push({
             "path": rows[i].path.slice(7),
