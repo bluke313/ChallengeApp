@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginLeft: "auto",
         marginRight: "auto",
-        backgroundColor: "red",
+        // backgroundColor: "red",
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",

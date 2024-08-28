@@ -40,12 +40,12 @@ export default function PhotoUpload({username, fresh}) {
             <>
               <Image
                 source={{ uri: photo.uri }}
-                style={{ width: 300, height: 300 }}
+                style={{ width: 300, height: 250 }}
               />
               <Button title="Upload Photo" onPress={handlePhotoUpload} />
             </>
           )}
-          <Button title="Choose Photo" onPress={handleChoosePhoto} />
+          {/* <Button title="Choose Photo" onPress={handleChoosePhoto} /> */}
         </View>
       );
 }
