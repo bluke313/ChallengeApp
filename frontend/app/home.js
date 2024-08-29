@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { dropSecret, retrieveSecret } from './Storage.js';
-import { Feed } from '../assets/assets.js';
+import { Feed } from '@assets/assets.js';
 import { useState, useEffect, useRef } from 'react';
 
 const home = () => {

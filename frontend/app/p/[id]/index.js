@@ -4,10 +4,10 @@ import { router, useGlobalSearchParams } from 'expo-router';
 import { shouldUseActivityState } from 'react-native-screens';
 
 
-import IndicatorButton from '../../Components/Button.js';
-import UserIcon from '../../Components/Icons.js';
-import TabSelect, { TabArea } from '../../Components/Tabs.js';
-import PhotoUpload from '../../Components/PhotoUpload.js';
+import IndicatorButton from '@components/Button.js';
+import UserIcon from '@components/Icons.js';
+import TabSelect, { TabArea } from '@components/Tabs.js';
+import PhotoUpload from '@components/PhotoUpload.js';
 import { retrieveSecret } from '../../Storage.js'
 import { ChallengesView } from '../../Challenge/Challenge.js'
 
