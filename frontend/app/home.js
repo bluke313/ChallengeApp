@@ -56,7 +56,6 @@ const home = () => {
                     <Text style={styles.buttonText}>Sign Out</Text>
                 </Pressable>
                 <Feed user={username} />
-                <Text style={{ fontSize: 50, width: 20, alignSelf: 'center' }}>abcdefghijklmnopqrstuvwxyz</Text>
             </ScrollView>
 
             <View style={styles.tabs}>

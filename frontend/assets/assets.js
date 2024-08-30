@@ -34,8 +34,6 @@ export const Feed = ({ user }) => {
                 }
             );
             const responseJson = await response.json();
-            // console.log('Here is the feed');
-            // console.log(responseJson);
             setFeedData(responseJson);
         } catch (err) {
             console.error(err);
@@ -46,7 +44,7 @@ export const Feed = ({ user }) => {
 
     return (
         <View>
-            {feedData == null ? null : <FeedImage image={feedData} />}
+            {feedData == null ? null : feedData.map( (data, i) =>  <FeedImage key={i} image={data} />)}
         </View>
     )
 };
@@ -55,6 +53,7 @@ export const Feed = ({ user }) => {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+        paddingBottom: "100px"
     },
     title: {
         fontSize: 24,

@@ -222,6 +222,7 @@ function formateImagePathsFromDBRows(rows) {
     let paths = []
     // console.log('Forming image paths from DB rows...');
     for (let i = 0; i < rows.length; i++) {
+        console.log(rows[i])
         paths.push({
             "path": rows[i].path.slice(7),
             "caption": rows[i].caption,
@@ -299,7 +300,7 @@ router.route('/feed').get(async (req, res) => {
     // currentUserId = req.userId
     // db.get(`SELECT path, timestamp, caption, id FROM Images WHERE userId IN (SELECT friendId FROM Friends WHERE userID = :currentUserId)`)
     console.log('Getting feed...');
-    db.get(`SELECT path, timestamp, caption, id FROM Images WHERE id = 12`,
+    db.all(`SELECT path, timestamp, caption, id FROM Images ORDER BY timestamp;`,
         async (err, row) => {
             if (err) {
                 console.log(`/feed ERROR: ${err}`);
@@ -307,7 +308,7 @@ router.route('/feed').get(async (req, res) => {
             }
             else {
                 // console.log(row);
-                res.status(200).send(formateImagePathsFromDBRows([row])[0]);
+                res.status(200).send(formateImagePathsFromDBRows(row));
             }
         })
 })
