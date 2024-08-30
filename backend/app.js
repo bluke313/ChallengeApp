@@ -115,7 +115,7 @@ router.route('/signup').post(async (req, res) => {
                                 email: req.body.email
                             },
                             "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi",
-                            { expiresIn: "1h" }
+                            { expiresIn: "48h" }
                         );
                     } catch (err) {
                         console.log(`/signupError: ${err}`);
@@ -144,7 +144,6 @@ router.route('/signup').post(async (req, res) => {
 
 router.route('/login').post(async (req, res) => {
     //add to db
-    // console.log(req.body)
     let error = null
     let password = null
     db.get(`SELECT * FROM Users WHERE email = '${req.body.email}'`, async (err, row) => {
@@ -186,10 +185,6 @@ router.route('/login').post(async (req, res) => {
 })
 
 router.route('/profile').post(authenticateToken, async (req, res) => {
-    // console.log(req.body)
-
-    console.log(req.body)
-
     db.all(`
         SELECT Images.path, Images.timestamp, Images.caption, Images.id FROM Images 
         inner join Users 
@@ -210,7 +205,6 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                 res.status(500).send({ "message": "Database error!", "success": false })
                 return
             }
-            // console.log(row)
             res.status(200).send({ "username": req.body.userId.userId, "bio": row ? row.bio : null, "images": imagePaths, "ownProfile": req.body.pageUserName === req.body.userId.userId })
             return
         })
@@ -220,9 +214,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
 
 function formateImagePathsFromDBRows(rows) {
     let paths = []
-    // console.log('Forming image paths from DB rows...');
     for (let i = 0; i < rows.length; i++) {
-        console.log(rows[i])
         paths.push({
             "path": rows[i].path.slice(7),
             "caption": rows[i].caption,
@@ -255,7 +247,6 @@ router.route('/upload').post(async (req, res) => {
         const caption = JSON.parse(req.body.body).caption
         const filePath = req.file.path
         const timestamp = getDateTimeForDB()
-        // console.log(timestamp)
 
         db.get(`SELECT id FROM Users WHERE username = '${username}'`, async (err, row) => {
             if (err) {
@@ -271,7 +262,6 @@ router.route('/upload').post(async (req, res) => {
 })
 
 router.route('/i/:challengeId').get(authenticateToken, async (req, res) => {
-    // console.log(req.params)
     if (isNaN(req.params.challengeId)) {
         res.sendStatus(500)
         return
@@ -290,25 +280,39 @@ router.route('/i/:challengeId').get(authenticateToken, async (req, res) => {
 })
 
 router.route('/savebio').post(authenticateToken, async (req, res) => {
-    // console.log(req.body)
     db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
     res.status(200).send({ "message": "Bio updated" })
 
 })
 
-router.route('/feed').get(async (req, res) => {
+router.route('/feed').get(authenticateToken, async (req, res) => {
     // currentUserId = req.userId
     // db.get(`SELECT path, timestamp, caption, id FROM Images WHERE userId IN (SELECT friendId FROM Friends WHERE userID = :currentUserId)`)
-    console.log('Getting feed...');
-    db.all(`SELECT path, timestamp, caption, id FROM Images ORDER BY timestamp;`,
+    // console.log('Getting feed...');
+    db.get(`SELECT id FROM Users WHERE username = '${req.body.userId.userId}';`, 
         async (err, row) => {
             if (err) {
                 console.log(`/feed ERROR: ${err}`);
                 res.status(500).send({ 'message': 'Database error!', 'success': false });
             }
             else {
-                // console.log(row);
-                res.status(200).send(formateImagePathsFromDBRows(row));
+                console.log(row)
+                let userId = row.id
+                db.all(`
+                        SELECT i.path, i.timestamp, i.caption, i.id FROM Images i 
+                        INNER JOIN Associations a
+                        ON a.targetUserId = i.userId
+                        WHERE a.type = 1 and a.userId = ${userId}
+                        ORDER BY i.timestamp;`,
+                    async (err, row) => {
+                        if (err) {
+                            console.log(`/feed ERROR: ${err}`);
+                            res.status(500).send({ 'message': 'Database error!', 'success': false });
+                        }
+                        else {
+                            res.status(200).send(formateImagePathsFromDBRows(row));
+                        }
+                    })
             }
         })
 })

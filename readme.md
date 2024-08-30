@@ -18,3 +18,6 @@ Accent: #38c880
 Babel:
 npm install --save-dev babel-plugin-module-resolver
 npm start --reset-cache
+
+To Do:
+feed -> click on image -> refresh page -> press return

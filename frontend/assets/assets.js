@@ -1,17 +1,25 @@
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
+import { router } from 'expo-router';
+import { retrieveSecret } from '../app/Storage';
+
+
 
 const FeedImage = ({ image }) => {
-
     return (
         <View style={styles.container}>
             <Text>This is a FeedImage</Text>
-            <Image
-                style={styles.image}
-                source={{
-                    uri: `http://localhost:3000/${image.path}`,
-                }}
-            />
+            <Pressable 
+                onPress={() => router.push(`i/${image.id}`)}
+                key={`${image.id}-image`}
+            >
+                <Image
+                    style={styles.image}
+                    source={{
+                        uri: `http://localhost:3000/${image.path}`,
+                    }}
+                />
+            </Pressable>
             <Text style={styles.caption}>{image.caption == null ? null : image.caption}</Text>
             <Text style={styles.timestamp}>Uploaded {image.timestamp}</Text>
         </View>
@@ -23,6 +31,7 @@ export const Feed = ({ user }) => {
 
     const fetchFeed = async () => {
         try {
+            const token = await retrieveSecret('authToken')
             const response = await fetch(
                 'http://localhost:3000/feed',
                 {
@@ -30,6 +39,7 @@ export const Feed = ({ user }) => {
                     headers: {
                         Accept: 'application/json',
                         'content-Type': 'application/json',
+                        authorization: `Bearer ${token}`
                     },
                 }
             );
