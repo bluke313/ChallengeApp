@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import { router, Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage.js';
 import { storeSecret } from './Storage.js'
 import { Button } from '@assets/button.js';
+import { PrimaryButton } from './Components/Button.js';
+import { SecureTextinput, StyledTextInput } from '../assets/input.js';
 
 const Login = (props) => {
 
@@ -98,28 +100,19 @@ const Login = (props) => {
 
         <View style={styles.container}>
             <Text style={styles.title}>Login</Text>
-            <TextInput
-                style={styles.input}
+            <StyledTextInput 
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
                 onKeyPress={handleKeyPress}
             />
-            <View style={styles.password}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    onKeyPress={handleKeyPress}
-                    secureTextEntry={!showPassword}
-                />
-                <Pressable onPress={() => setShowPassword(!showPassword)} style={{ width: 0, right: 37 }}>
-                    <Text selectable={false} style={styles.showPassword}>
-                        {showPassword ? '\u{1F512}' : '\u{1F513}'}
-                    </Text>
-                </Pressable>
-            </View>
+            <SecureTextinput 
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                onKeyPress={handleKeyPress}
+                secureTextEntry={!showPassword}
+            />
             <Button text='Login' onPress={handleLogin} disabled={!allowLogin}/>
             <Link style={styles.link} href='/SignUp'>
                 <Text style={styles.linkText}>Sign Up</Text>

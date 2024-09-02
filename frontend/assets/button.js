@@ -1,8 +1,31 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
+import { colors } from "./theme";
 
-export const Button = ({ text, onPress, disabled }) => {
+export const Button = ({ text, disabled, ...rest }) => {
+    const styles = StyleSheet.create({
+        button: {
+            backgroundColor: colors.primary,
+            padding: 10,
+            alignItems: 'center',
+            borderRadius: 5,
+            margin: 5,
+        },
+        disabledButton: {
+            backgroundColor: colors.primary,
+            opacity: .5,
+            padding: 10,
+            alignItems: 'center',
+            borderRadius: 5,
+            margin: 5,
+        },
+        buttonText: {
+            color: colors.text,
+            fontSize: 16,
+        }
+    })
+    
     return (
-        <Pressable style={disabled ? styles.disabledButton : styles.button} onPress={onPress}>
+        <Pressable style={disabled ? styles.disabledButton : styles.button} {...rest}>
             <Text style={styles.buttonText}>{text}</Text>
         </Pressable>
     )
@@ -23,12 +46,9 @@ export const Tabs = ({ handleHome, handleProfile }) => {
 };
 
 const styles = StyleSheet.create({
-    button: {
-        backgroundColor: '#1f8a55',
-        padding: 10,
-        alignItems: 'center',
-        borderRadius: 5,
-        margin: 5,
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
     },
     tabsButton: {
         backgroundColor: '#1f8a55',
@@ -47,16 +67,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 10,
         backgroundColor: '#38c880',
-    },
-    disabledButton: {
-        backgroundColor: '#8bdbb3',
-        padding: 10,
-        alignItems: 'center',
-        borderRadius: 5,
-        margin: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
     }
 });
