@@ -1,21 +1,19 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { Link, router } from "expo-router";
+import { Button } from '@assets/button.js';
 
 export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
+        <Text style={{color: '#8bdbb3', fontSize: 50 }}>Primary</Text>
+        <Text style={{color: '#1f8a55', fontSize: 50 }}>Secondary</Text>
+        <Text style={{color: '#38c880', fontSize: 50 }}>Accent</Text>
         <Text style={styles.title}>Challenge App</Text>
         <Text style={styles.subtitle}>Dev navigation page</Text>
-        <Pressable style={styles.button} onPress={() => router.push("/Login")}>
-          <Text style={styles.buttonText}>Login</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={() => router.push("/SignUp")}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={() => router.push("/home")}>
-          <Text style={styles.buttonText}>home</Text>
-        </Pressable>
+        <Button onPress={() => router.push("/Login")} text='Login'/>
+        <Button onPress={() => router.push("/SignUp")} text='SignUp'/>
+        <Button onPress={() => router.push("/home")} text='Home'/>
       </View>
     </View>
   );
@@ -26,6 +24,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 24,
+    backgroundColor: '#030806',
+    color: 'white'
   },
   main: {
     flex: 1,
@@ -36,20 +36,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 64,
     fontWeight: "bold",
+    color: '#fff',
   },
   subtitle: {
     fontSize: 36,
-    color: "#38434D",
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    padding: 10,
-    alignItems: 'center',
-    borderRadius: 5,
-    margin: 5,
-  },
-  buttonText: {
     color: '#fff',
-    fontSize: 16,
-}
+  },
 });

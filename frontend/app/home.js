@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { dropSecret, retrieveSecret } from './Storage.js';
 import { Feed } from '@assets/assets.js';
 import { useState, useEffect, useRef } from 'react';
+import { Button, Tabs } from '@assets/button.js';
 
 const home = () => {
     const [username, setUsername] = useState('');
@@ -49,29 +50,11 @@ const home = () => {
 
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <Text style={styles.title}>Home Page</Text>
-                <Pressable
-                    onPress={() => { dropSecret('authToken'); router.push('/Login') }}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Sign Out</Text>
-                </Pressable>
+                <Button onPress={() => { dropSecret('authToken'); router.push('/Login') }} text='Sign Out' />
                 <Feed user={username} />
             </ScrollView>
 
-            <View style={styles.tabs}>
-                <Pressable
-                    onPress={scrollToTop}
-                    style={styles.tabButton}
-                >
-                    <Text style={styles.buttonText} >{`\u{1F3E0}`}</Text>
-                </Pressable>
-                <Pressable
-                    onPress={() => { router.push(`/p/${username}`) }}
-                    style={styles.tabButton}
-                >
-                    <Text style={styles.buttonText} >{`\u{1F9D1}`}</Text>
-                </Pressable>
-            </View>
+            <Tabs handleHome={scrollToTop} handleProfile={() => router.push(`/p/${username}`)}/>
 
         </View>
     );
@@ -82,16 +65,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 16,
         textAlign: 'center',
-    },
-    button: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-    },
-    buttonText: {
         color: '#fff',
-        fontSize: 16,
     },
     container: {
         flex: 1,
@@ -101,25 +75,8 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
         alignContent: 'center',
+        backgroundColor: '#030806',
     },
-    tabs: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        padding: 10,
-        backgroundColor: 'lightblue',
-    },
-    tabButton: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginHorizontal: 5,
-        width: 100,
-    }
 });
 
 export default home;

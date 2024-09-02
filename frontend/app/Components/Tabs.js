@@ -7,7 +7,7 @@ export default function TabSelect({tabItems, setActive, active}) {
   const Tab = ({children, index, onPress}) => {
 
     return (
-      <Pressable onPress={onPress} style={active == index ? {...styles.buttonStyle, width: `${100 / tabItems.length}%`} : {...styles.buttonStyle, backgroundColor: "rgba(0,0,0,0)", width: `${100 / tabItems.length}%`}}>
+      <Pressable onPress={onPress} style={active == index ? {...styles.buttonStyle, width: `${100 / tabItems.length}%`} : {...styles.buttonStyle, backgroundColor: '#8bdbb3', width: `${100 / tabItems.length}%`}}>
         <Text style={styles.textStyle}>{children}</Text>
       </Pressable>
     )
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 4,
     borderRadius: 50,
-    backgroundColor: "white",
+    backgroundColor: "#38c880",
   },
   textStyle: {
     textAlign: "center",

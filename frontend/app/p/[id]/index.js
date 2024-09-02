@@ -10,6 +10,7 @@ import TabSelect, { TabArea } from '@components/Tabs.js';
 import PhotoUpload from '@components/PhotoUpload.js';
 import { retrieveSecret } from '../../Storage.js'
 import { ChallengesView } from '../../Challenge/Challenge.js'
+import { Button, Tabs } from '@assets/button.js';
 
 const Profile = () => {
     const [active, setActive] = useState(0)
@@ -131,33 +132,23 @@ const Profile = () => {
         <View style={styles.container}>
 
             <ScrollView ref={scrollViewRef} style={styles.content}>
+                
                 <View style={styles.topView}>
                     <Text style={styles.title}>Profile page</Text>
-                    <UserIcon style={styles.userIconPosition} />
+                    <UserIcon style={styles.userIcon} />
                 </View>
+
                 <View style={styles.infoView}>
                     <Text style={styles.header1}>{glob.id}</Text>
                     {bio == null && ownPage ? <AddBio /> : bio == null ? null : <Text style={styles.bio}>{bio}</Text>}
-                    <IndicatorButton>13 Group Mates</IndicatorButton>
+                    <Button text='13 Group Mates' />
                     <View style={styles.bufferStyle}></View>
                     <ProfileData/>
                 </View>
+
             </ScrollView>
 
-            <View style={styles.tabs}>
-                <Pressable
-                    onPress={() => { router.push(`/home`) }}
-                    style={styles.tabButton}
-                >
-                    <Text style={styles.buttonText} >{`\u{1F3E0}`}</Text>
-                </Pressable>
-                <Pressable
-                    onPress={scrollToTop}
-                    style={styles.tabButton}
-                >
-                    <Text style={styles.buttonText} >{`\u{1F9D1}`}</Text>
-                </Pressable>
-            </View>
+            <Tabs handleHome={() => router.push('/home')} handleProfile={scrollToTop} />
 
         </View>
     );
@@ -168,6 +159,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 16,
         textAlign: 'center',
+        color: '#fff',
     },
     bufferStyle: {
         display: "block",
@@ -178,25 +170,28 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: "bold",
         marginBottom: 4,
+        color: '#fff',
     },
     bio: {
         fontSize: 15,
         marginBottom: 4,
         marginTop: 4,
-        maxWidth: "75%"
+        maxWidth: "75%",
+        color: '#fff',
     },
     topView: {
-        backgroundColor: '#007BFF',
-        height: '25%',
+        backgroundColor: '#1f8a55',
+        height: '10vh',
         padding: 30
     },
     infoView: {
         padding: 16,
     },
-    userIconPosition: {
+    userIcon: {
         position: "absolute",
         bottom: 0 - 44,
-        right: 16 //NOTE 24 might be better
+        right: 16, //NOTE 24 might be better
+        backgroundColor: '#38c880',
     },
     input: {
         height: 40,
@@ -217,44 +212,15 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: "0.375rem"
     },
-    button: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        alignItems: 'center',
-        alignSelf: 'center',
-        borderRadius: 5,
-        minWidth: 100,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
     container: {
         flex: 1,
         justifyContent: 'flex-start',
+        backgroundColor: '#030806',
         // height: '100vh', REMOVED
     },
     content: {
         flex: 1,
     },
-    tabs: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        padding: 10,
-        backgroundColor: 'lightblue',
-    },
-    tabButton: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginHorizontal: 5,
-        width: 100,
-    }
 });
 
 export default Profile;

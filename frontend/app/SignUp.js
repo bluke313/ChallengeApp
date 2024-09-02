@@ -2,7 +2,8 @@ import React, { useState, useEffect, component } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
-import {storeSecret} from './Storage.js'
+import {storeSecret} from './Storage.js';
+import { Button } from '@assets/button.js';
 
 
 const SignUp = (props) => {
@@ -104,9 +105,7 @@ const SignUp = (props) => {
                     </Text>
                 </Pressable>
             </View>
-            <Pressable disabled={!allowSignUp} onPress={handleLogin} style={ allowSignUp ? styles.button : styles.disabledButton}>
-                <Text style={styles.buttonText}>Sign Up</Text>
-            </Pressable>
+            <Button onPress={handleLogin} text='Sign Up' disabled={!allowSignUp} />
             <Link style={styles.link} href='/Login'>
                 <Text style={styles.linkText}>I already have an account</Text>
             </Link>
@@ -121,6 +120,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 16,
+        backgroundColor: '#030806',
     },
     title: {
         fontSize: 24,
@@ -129,42 +129,24 @@ const styles = StyleSheet.create({
         top: 20,
         padding: 10,
         alignSelf: 'center',
+        color: '#fff',
     },
     input: {
         height: 40,
-        borderColor: '#ccc',
+        borderColor: '#38c880',
+        color: '#fff',
         borderWidth: 1,
         marginBottom: 12,
         paddingHorizontal: 8,
         width: 220,
         alignSelf: 'center',
     },
-    button: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        alignItems: 'center',
-        alignSelf: 'center',
-        borderRadius: 5,
-        minWidth: 100,
-    },
-    disabledButton: {
-        backgroundColor: '#add5ff',
-        padding: 10,
-        alignItems: 'center',
-        alignSelf: 'center',
-        borderRadius: 5,
-        minWidth: 100,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
     link: {
         alignSelf: 'center',
         margin: 5,
     },
     linkText: {
-        color: 'blue',
+        color: '#8bdbb3',
     },
     password: {
         flexDirection: 'row',

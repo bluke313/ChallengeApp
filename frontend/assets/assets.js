@@ -86,15 +86,17 @@ const styles = StyleSheet.create({
         width: 350,
         height: 400,
         borderWidth: 2,
-        borderColor: '#007BFF',
+        borderColor: '#38c880',
         backgroundColor: 'white',
     },
     caption: {
         fontFamily: 'sans-serif',
         marginTop: 3,
+        color: '#fff',
     },
     timestamp: {
         fontFamily: 'sans-serif',
         marginBottom: 3,
+        color: '#fff',
     },
 });

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useEffect, useState } from 'react'
 import { retrieveSecret } from '../../Storage.js'
 import { router, useGlobalSearchParams } from 'expo-router';
+import { Button, Tabs } from '@assets/button.js';
 
 export default function Challenge({ challenge }) {
     const [photoData, setPhotoData] = useState(null)
@@ -42,9 +43,7 @@ export default function Challenge({ challenge }) {
         <View style={styles.container}>
 
             <View style={styles.content}>
-                <Pressable style={styles.returnButton} onPress={() => router.back()}>
-                    <Text style={styles.buttonText}>Return</Text>
-                </Pressable>
+                <Button onPress={() => router.back()} text='Return' />
                 {photoData == null ? <Text style={styles.errorText}>IMAGE NOT FOUND</Text> :
                     <View style={styles.imageContainer}>
                         <Image
@@ -56,23 +55,9 @@ export default function Challenge({ challenge }) {
                         <Text style={styles.caption}>{photoData.caption == null ? null : photoData.caption}</Text>
                         <Text style={styles.timestamp}>Uploaded {photoData.timestamp}</Text>
                     </View>}
-                {/* <Pressable style={styles.button} onPress={ () => { console.log(photoData)}}><Text style={styles.buttonText}>test</Text></Pressable> */}
             </View>
-
-            {/* <View style={styles.tabs}>            ATTEMPT TO ADD TABS TO IMAGE VIEWING SCREEN. KNOWN BUGS
-                <Pressable
-                    onPress={() => { router.push(`/home`) }}
-                    style={styles.tabButton}
-                >
-                    <Text style={styles.buttonText} >{`\u{1F3E0}`}</Text>
-                </Pressable>
-                <Pressable
-                    onPress={() => { router.push(`/p/${username}`) }}
-                    style={styles.tabButton}
-                >
-                    <Text style={styles.buttonText} >{`\u{1F9D1}`}</Text>
-                </Pressable>
-            </View> */}
+            
+            <Tabs handleHome={() => router.push('/home')} />
 
         </View>
     )
@@ -82,48 +67,32 @@ export default function Challenge({ challenge }) {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
+        backgroundColor: '#030806',
+        height: '100vh',
     },
     imageContainer: {
         borderWidth: 5,
-        borderColor: '#007BFF',
-        backgroundColor: 'lightblue',
-        marginTop: 100,
+        borderColor: '#1f8a55',
+        backgroundColor: '#1f8a55',
+        marginTop: 45,
         alignItems: 'center',
     },
     image: {
         width: 350,
         height: 400,
         borderWidth: 2,
-        borderColor: '#007BFF',
-        backgroundColor: 'white',
+        borderColor: '#1f8a55',
+        backgroundColor: '#030806',
     },
     caption: {
         fontFamily: 'sans-serif',
         marginTop: 3,
+        color: '#fff',
     },
     timestamp: {
         fontFamily: 'sans-serif',
         marginBottom: 3,
-    },
-    returnButton: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        margin: 20,
-    },
-    button: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
+        color: '#8bdbb3',
     },
     errorText: {
         color: 'red',
@@ -135,22 +104,4 @@ const styles = StyleSheet.create({
         padding: 16,
         alignContent: 'center',
     },
-    tabs: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        padding: 10,
-        backgroundColor: 'lightblue',
-    },
-    tabButton: {
-        backgroundColor: '#007BFF',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginHorizontal: 5,
-        width: 100,
-    }
 })

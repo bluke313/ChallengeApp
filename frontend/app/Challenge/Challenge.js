@@ -42,6 +42,7 @@ export const ChallengesView = ({user, fresh}) => {
         <View style={styles.challengeViewStyle}>
             {challenges.map((item, i) => 
                 <Pressable 
+                style={{ borderColor: '#38c880', borderWidth: 1}}
                 onPress={() => router.push(`i/${item.id}`)}
                 key={`${user}-image-${i}`}
                 >

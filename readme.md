@@ -8,7 +8,7 @@ to start frontend:
 
 colors:
 
-Text: white
+Text: #fff
 Background: #030806
 Primary: #8bdbb3
 Secondary: #1f8a55
