@@ -14,7 +14,6 @@ const SignUp = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
     const [allowSignUp, setAllowSignUp] = useState(false);
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -96,7 +95,6 @@ const SignUp = (props) => {
                 value={password}
                 onChangeText={setPassword}
                 onKeyPress={handleKeyPress}
-                secureTextEntry={!showPassword}
             />
             <Button onPress={handleLogin} text='Sign Up' disabled={!allowSignUp} />
             <Link style={styles.link} href='/Login'>

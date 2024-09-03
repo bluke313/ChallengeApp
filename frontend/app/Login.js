@@ -12,7 +12,6 @@ const Login = (props) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
     const [allowLogin, setAllowLogin] = useState(false);
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -111,7 +110,6 @@ const Login = (props) => {
                 value={password}
                 onChangeText={setPassword}
                 onKeyPress={handleKeyPress}
-                secureTextEntry={!showPassword}
             />
             <Button text='Login' onPress={handleLogin} disabled={!allowLogin}/>
             <Link style={styles.link} href='/SignUp'>
@@ -167,9 +165,6 @@ const styles = StyleSheet.create({
     },
     password: {
         flexDirection: 'row',
-    },
-    showPassword: {
-        fontSize: 30,
     },
 });
 
