@@ -3,7 +3,28 @@ import { useState, useEffect, useRef } from 'react';
 import { router } from 'expo-router';
 import { retrieveSecret } from '../Storage';
 
-
+const getUsername = async () => {
+    try {
+        const token = await retrieveSecret('authToken')
+        console.log(`Token: ${token}`)
+        const response = await fetch(
+            'http://localhost:3000/home',
+            {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                },
+            }
+        );
+        const responseJson = await response.json();
+        console.log(responseJson)
+        setUsername(responseJson.username)
+    } catch (err) {
+        console.error(err);
+    }
+};
 
 const FeedImage = ({ image }) => {
     return (
@@ -31,7 +52,7 @@ export const Feed = ({ user }) => {
 
     const fetchFeed = async () => {
         try {
-            const token = await retrieveSecret('authToken')
+            const token = await retrieveSecret('authToken');
             const response = await fetch(
                 'http://localhost:3000/feed',
                 {
@@ -39,7 +60,7 @@ export const Feed = ({ user }) => {
                     headers: {
                         Accept: 'application/json',
                         'content-Type': 'application/json',
-                        authorization: `Bearer ${token}`
+                        authorization: `Bearer ${token}`,
                     },
                 }
             );
@@ -55,6 +76,42 @@ export const Feed = ({ user }) => {
     return (
         <View>
             {feedData == null ? null : feedData.map( (data, i) =>  <FeedImage key={i} image={data} />)}
+        </View>
+    )
+};
+
+export const UserFeed = ({ user, searchText }) => {
+
+    const [feedData, setFeedData] = useState(null);
+
+    const fetchFeed = async () => {
+        try {
+            const token = await retrieveSecret('authToken')
+            const response = await fetch(
+                'http://localhost:3000/userFeed',
+                {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'content-Type': 'application/json',
+                        authorization: `Bearer ${token}`,
+                        query: `${searchText}`,
+                    },
+                }
+            );
+            const responseJson = await response.json();
+            setFeedData(responseJson);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => { fetchFeed() }, [searchText]);
+
+
+    return (
+        <View>
+            {feedData == null ? null : feedData.map( (data, i) =>  <Text key={i}>{data}</Text>)}
         </View>
     )
 };

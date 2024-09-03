@@ -88,14 +88,14 @@ export const Tabs = ({ handleHome, handleProfile }) => {
 export const Button = ({ text, disabled, ...rest }) => {
   const styles = StyleSheet.create({
       button: {
-          backgroundColor: colors.primary,
+          backgroundColor: colors.secondary,
           padding: 10,
           alignItems: 'center',
           borderRadius: 5,
           margin: 5,
       },
       disabledButton: {
-          backgroundColor: colors.primary,
+          backgroundColor: colors.secondary,
           opacity: .5,
           padding: 10,
           alignItems: 'center',

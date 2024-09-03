@@ -50,6 +50,7 @@ const home = () => {
 
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <Text style={styles.title}>Home Page</Text>
+                <Button onPress={() => router.push('/Search')} text='Search'/>
                 <Button onPress={() => { dropSecret('authToken'); router.push('/Login') }} text='Sign Out' />
                 <Feed user={username} />
             </ScrollView>
@@ -70,12 +71,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'flex-start',
+        backgroundColor: '#030806',
     },
     content: {
         flex: 1,
         padding: 16,
         alignContent: 'center',
-        backgroundColor: '#030806',
     },
 });
 

@@ -39,6 +39,12 @@ const RootLayout = () => {
                     headerShown: false,
                 }}
             />
+            <Stack.Screen
+                name="Search"
+                options={{
+                    headerShown: false,
+                }}
+            />
         </Stack>
     )
 };
