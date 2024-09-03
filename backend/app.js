@@ -357,33 +357,23 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
         })
 })
 
-// console.log(`
-// UPDATE Associations 
-// SET type = ${Number(req.body.code)} 
-// WHERE userId = 
-//     (SELECT id FROM Users 
-//     WHERE username = '${req.body.userId.userId}')
-// AND targetUserId = 
-//     (SELECT id FROM Users
-//     WHERE username = '${req.body.pageUserName}');`)
-// db.run(`
-//     UPDATE Associations 
-//     SET type = ${Number(req.body.code)} 
-//     WHERE userId = 
-//         (SELECT id FROM Users 
-//         WHERE username = '${req.body.userId.userId}')
-//     AND targetUserId = 
-//         (SELECT id FROM Users
-//         WHERE username = '${req.body.pageUserName}');`)
-
 function getSQLStringUserIdFromUsername(username) {
     return `(SELECT id FROM Users WHERE username = '${username}')`
 }
 
 router.route('/associationRequest').post(authenticateToken, async (req, res) => {
-    console.log(req.body)
+    let newFriends = req.body.currentCode
 
-    if(req.body.currentCode == -1){ //no existing friendship
+    if(req.body.currentCode == 0 && req.body.code == -1){ //cancel friend request
+        db.run(`DELETE FROM Associations
+                WHERE userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)} 
+                AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)};`,
+                async (err) => {
+                    newFriends = -1
+                    res.status(200).send({"message": "updated association", "friends": newFriends})
+                })
+    }
+    if(req.body.currentCode == -1 && req.body.code == 0){ //no existing friendship but a request is made
         //first check if the target has a pending request on you
         db.get(`
             SELECT type FROM Associations WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)}
@@ -398,30 +388,32 @@ router.route('/associationRequest').post(authenticateToken, async (req, res) => 
                     //no prior request so we make a pending friendship
                     db.run(`INSERT INTO Associations (timestamp, targetUserId, userId, type)
                             VALUES ('2024-71-18 13:43:18', ${getSQLStringUserIdFromUsername(req.body.pageUserName)}, ${getSQLStringUserIdFromUsername(req.body.userId.userId)}, 0);`)
+                    newFriends = 0
                 }
                 else if (row.type == 0){
                     db.run(`INSERT INTO Associations (timestamp, targetUserId, userId, type)
                             VALUES ('2024-71-18 13:43:18', ${getSQLStringUserIdFromUsername(req.body.pageUserName)}, ${getSQLStringUserIdFromUsername(req.body.userId.userId)}, 1);`)
                     db.run(`UPDATE Associations SET type = 1
                             WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)} AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};`)
+                    newFriends = 1
                 }
+                res.status(200).send({"message": "updated association", "friends": newFriends})
+                return
             }
         })
     }
-
-
-
-    res.status(200).send({"message": "updated association"})
-    // db.all(`SELECT id, username FROM Users WHERE username LIKE '%${req.body.query}%';`, 
-    //     async (err, row) => {
-    //         if (err) {
-    //             console.log(`/userFeed ERROR: ${err}`);
-    //             res.status(500).send({ 'message': 'Database error!', 'success': false });
-    //         }
-    //         else {
-    //             res.status(200).send({matches: row});
-    //         }
-    //     })
+    if(req.body.currentCode == 1){ //remove existing friendship
+        db.run(`DELETE FROM Associations
+                WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)} 
+                AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};`)
+        db.run(`DELETE FROM Associations
+                WHERE userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)} 
+                AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)};`,
+                async (err) => {
+                    newFriends = -1
+                    res.status(200).send({"message": "updated association", "friends": newFriends})
+                })
+    }
 })
 
 app.use(express.static('public'));

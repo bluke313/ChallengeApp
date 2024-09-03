@@ -154,6 +154,7 @@ const Profile = () => {
                 }
             );
             const responseJson = await response.json();
+            setFriendStatus(responseJson.friends)
             // console.log(responseJson)
         } catch (error) {
             console.error(error);
