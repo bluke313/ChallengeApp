@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { router } from 'expo-router';
-import { retrieveSecret } from '../app/Storage';
+import { retrieveSecret } from '../Storage';
 
 
 

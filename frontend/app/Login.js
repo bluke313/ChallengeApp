@@ -3,9 +3,9 @@ import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
 import { router, Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage.js';
 import { storeSecret } from './Storage.js'
-import { Button } from '@assets/button.js';
+import { Button } from '@components/Button.js';
 import { PrimaryButton } from './Components/Button.js';
-import { SecureTextinput, StyledTextInput } from '../assets/input.js';
+import { SecureTextinput, StyledTextInput } from '@components/Input.js';
 
 const Login = (props) => {
 

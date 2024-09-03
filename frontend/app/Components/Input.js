@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, TextInput, Text, View, Pressable } from "react-native";
-import { colors } from "./theme";
+import { colors } from "../../assets/theme";
 
 export const StyledTextInput = ({...rest}) => {
     const [focused, setFocused] = useState(false)

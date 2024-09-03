@@ -1,9 +1,9 @@
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { dropSecret, retrieveSecret } from './Storage.js';
-import { Feed } from '@assets/assets.js';
+import { Feed } from '@components/Feed.js';
 import { useState, useEffect, useRef } from 'react';
-import { Button, Tabs } from '@assets/button.js';
+import { Button, Tabs } from '@components/Button.js';
 
 const home = () => {
     const [username, setUsername] = useState('');

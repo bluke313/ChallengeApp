@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
 import { useEffect, useState } from 'react'
 import { retrieveSecret } from '../../Storage.js'
 import { router, useGlobalSearchParams } from 'expo-router';
-import { Button, Tabs } from '@assets/button.js';
+import { Button, Tabs } from '@components/Button.js';
 
 export default function Challenge({ challenge }) {
     const [photoData, setPhotoData] = useState(null)

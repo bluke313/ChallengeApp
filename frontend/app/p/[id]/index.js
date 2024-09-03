@@ -10,7 +10,7 @@ import TabSelect, { TabArea } from '@components/Tabs.js';
 import PhotoUpload from '@components/PhotoUpload.js';
 import { retrieveSecret } from '../../Storage.js'
 import { ChallengesView } from '../../Challenge/Challenge.js'
-import { Button, Tabs } from '@assets/button.js';
+import { Button, Tabs } from '@components/Button.js';
 
 const Profile = () => {
     const [active, setActive] = useState(0)

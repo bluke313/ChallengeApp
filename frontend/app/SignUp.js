@@ -3,9 +3,9 @@ import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-nativ
 import { Link, router } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
 import {storeSecret} from './Storage.js';
-import { Button } from '@assets/button.js';
+import { Button } from '@components/Button.js';
 import { PrimaryButton } from './Components/Button';
-import { SecureTextinput, StyledTextInput } from '../assets/input.js';
+import { SecureTextinput, StyledTextInput } from './Components/Input.js';
 
 
 

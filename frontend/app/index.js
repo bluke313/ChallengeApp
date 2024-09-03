@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { Link, router } from "expo-router";
-import { Button } from '@assets/button.js';
+import { Button } from '@components/Button.js';
 
 export default function Page() {
   return (
