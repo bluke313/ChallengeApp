@@ -192,23 +192,50 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
         where Users.username = '${req.body.pageUserName}'
         order by Images.timestamp;
         `, async (err, row) => {
-        if (err) {
-            console.log(`/profile ERROR: ${err}`);
-            res.status(500).send({ "message": "Database error!", "success": false })
-            return
-        }
-        const imagePaths = formateImagePathsFromDBRows(row)
-
-        db.get(`select bio from Users where username = '${req.body.pageUserName}';`, async (err, row) => {
+            const ownProfile = req.body.pageUserName === req.body.userId.userId
             if (err) {
                 console.log(`/profile ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false })
                 return
             }
-            res.status(200).send({ "username": req.body.userId.userId, "bio": row ? row.bio : null, "images": imagePaths, "ownProfile": req.body.pageUserName === req.body.userId.userId })
+            const imagePaths = formateImagePathsFromDBRows(row)
+
+            db.get(`select bio from Users where username = '${req.body.pageUserName}';`, async (err, row) => {
+                if (err) {
+                    console.log(`/profile ERROR: ${err}`);
+                    res.status(500).send({ "message": "Database error!", "success": false })
+                    return
+                }
+                if(ownProfile){
+                    res.status(200).send({ "username": req.body.userId.userId, "bio": row ? row.bio : null, "images": imagePaths, "ownProfile": ownProfile })
+                }
+                else {
+                    const prevRow = row
+                    //gets association status if it's someone else's profile
+                    db.get(`
+                        SELECT Associations.type FROM Associations
+                        INNER JOIN Users
+                        ON Users.id = Associations.userId
+                        WHERE Users.username = '${req.body.userId.userId}'
+                        AND Associations.targetUserId = (SELECT id FROM Users WHERE username = '${req.body.pageUserName}');
+                    `, async (err, row) =>{
+                        if (err) {
+                            console.log(`/profile ERROR: ${err}`);
+                            res.status(500).send({ "message": "Database error!", "success": false })
+                            return
+                        }
+                        let friends = -1 //-1 means no association
+                        if(row !== undefined){
+                            friends = row.type
+                        }
+                        res.status(200).send({ "username": req.body.userId.userId, "bio": prevRow ? prevRow.bio : null, "images": imagePaths, "ownProfile": ownProfile, "friends": friends })
+                        
+                    })
+                }
+
+                return
+            })
             return
-        })
-        return
     })
 })
 
@@ -328,6 +355,73 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
                 res.status(200).send({matches: row});
             }
         })
+})
+
+// console.log(`
+// UPDATE Associations 
+// SET type = ${Number(req.body.code)} 
+// WHERE userId = 
+//     (SELECT id FROM Users 
+//     WHERE username = '${req.body.userId.userId}')
+// AND targetUserId = 
+//     (SELECT id FROM Users
+//     WHERE username = '${req.body.pageUserName}');`)
+// db.run(`
+//     UPDATE Associations 
+//     SET type = ${Number(req.body.code)} 
+//     WHERE userId = 
+//         (SELECT id FROM Users 
+//         WHERE username = '${req.body.userId.userId}')
+//     AND targetUserId = 
+//         (SELECT id FROM Users
+//         WHERE username = '${req.body.pageUserName}');`)
+
+function getSQLStringUserIdFromUsername(username) {
+    return `(SELECT id FROM Users WHERE username = '${username}')`
+}
+
+router.route('/associationRequest').post(authenticateToken, async (req, res) => {
+    console.log(req.body)
+
+    if(req.body.currentCode == -1){ //no existing friendship
+        //first check if the target has a pending request on you
+        db.get(`
+            SELECT type FROM Associations WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)}
+            AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};
+        `, async (err, row) => {
+            if(err) {
+                console.log(`/associationRequest ERROR: ${err}`);
+                res.status(500).send({ 'message': 'Database error!', 'success': false });
+            }
+            else {
+                if(row === undefined){
+                    //no prior request so we make a pending friendship
+                    db.run(`INSERT INTO Associations (timestamp, targetUserId, userId, type)
+                            VALUES ('2024-71-18 13:43:18', ${getSQLStringUserIdFromUsername(req.body.pageUserName)}, ${getSQLStringUserIdFromUsername(req.body.userId.userId)}, 0);`)
+                }
+                else if (row.type == 0){
+                    db.run(`INSERT INTO Associations (timestamp, targetUserId, userId, type)
+                            VALUES ('2024-71-18 13:43:18', ${getSQLStringUserIdFromUsername(req.body.pageUserName)}, ${getSQLStringUserIdFromUsername(req.body.userId.userId)}, 1);`)
+                    db.run(`UPDATE Associations SET type = 1
+                            WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)} AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};`)
+                }
+            }
+        })
+    }
+
+
+
+    res.status(200).send({"message": "updated association"})
+    // db.all(`SELECT id, username FROM Users WHERE username LIKE '%${req.body.query}%';`, 
+    //     async (err, row) => {
+    //         if (err) {
+    //             console.log(`/userFeed ERROR: ${err}`);
+    //             res.status(500).send({ 'message': 'Database error!', 'success': false });
+    //         }
+    //         else {
+    //             res.status(200).send({matches: row});
+    //         }
+    //     })
 })
 
 app.use(express.static('public'));

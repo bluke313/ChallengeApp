@@ -18,6 +18,7 @@ const Profile = () => {
     const [bio, setBio] = useState(null)
     const [fresh, setFresh] = useState(true)
     const [ownPage, setOwnPage] = useState(false)
+    const [friendStatus, setFriendStatus] = useState(-1) //0 pending 1 friend 2 blocked
     const bioRef = useRef(null)
     const scrollViewRef = useRef(null);
 
@@ -54,6 +55,10 @@ const Profile = () => {
                 setUser(responseJson.username)
                 setBio(responseJson.bio)
                 setOwnPage(responseJson.ownProfile)
+                if(!responseJson.ownProfile){
+                    console.log("setting friend status to: " + responseJson.friends)
+                    setFriendStatus(responseJson.friends)
+                }
                 // setChallenges(responseJson.images)
             } catch (error) {
                 console.error(error);
@@ -128,6 +133,51 @@ const Profile = () => {
         )
     }
 
+    const sendAssociationRequest = async (code) => {
+        try {
+            const token = await retrieveSecret('authToken')
+            console.log(`Token: ${token}`)
+            const response = await fetch(
+                'http://localhost:3000/associationRequest',
+                {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        "code": code,
+                        "currentCode": friendStatus,
+                        "pageUserName": glob.id
+                    }),
+                }
+            );
+            const responseJson = await response.json();
+            // console.log(responseJson)
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const SocialButton = () => {
+        if(friendStatus == -1){
+            return (
+                <Button onPress={() => sendAssociationRequest(0)} text='Add Friend' />
+            )
+        }
+        else if(friendStatus == 0) {
+            return (
+                <Button onPress={() => sendAssociationRequest(-1)} text='Cancel Friend Request' />
+            )
+        }
+        else {
+            return (
+                <Button onPress={() => sendAssociationRequest(-1)} text='Remove Friend' />
+            )
+        }
+    }
+
     return (
         <View style={styles.container}>
 
@@ -141,7 +191,10 @@ const Profile = () => {
                 <View style={styles.infoView}>
                     <Text style={styles.header1}>{glob.id}</Text>
                     {bio == null && ownPage ? <AddBio /> : bio == null ? null : <Text style={styles.bio}>{bio}</Text>}
-                    <Button text='13 Group Mates' />
+                    <View>
+                        <Button text='13 Group Mates' />
+                        <SocialButton />
+                    </View>
                     <View style={styles.bufferStyle}></View>
                     <ProfileData/>
                 </View>
