@@ -317,29 +317,15 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
         })
 })
 
-router.route('/userFeed').get(authenticateToken, async (req, res) => {
-    // currentUserId = req.userId
-    // db.get(`SELECT path, timestamp, caption, id FROM Images WHERE userId IN (SELECT friendId FROM Friends WHERE userID = :currentUserId)`)
-    // console.log('Getting feed...');
-    db.get(`SELECT id FROM Users WHERE username = '${req.body.userId.userId}';`, 
+router.route('/userFeed').post(authenticateToken, async (req, res) => {
+    db.all(`SELECT id, username FROM Users WHERE username LIKE '%${req.body.query}%';`, 
         async (err, row) => {
             if (err) {
-                console.log(`/feed ERROR: ${err}`);
+                console.log(`/userFeed ERROR: ${err}`);
                 res.status(500).send({ 'message': 'Database error!', 'success': false });
             }
             else {
-                console.log(row)
-                let userId = row.id
-                db.all(`SELECT id FROM Users WHERE username LIKE '';`,
-                    async (err, row) => {
-                        if (err) {
-                            console.log(`/feed ERROR: ${err}`);
-                            res.status(500).send({ 'message': 'Database error!', 'success': false });
-                        }
-                        else {
-                            res.status(200).send(formateImagePathsFromDBRows(row));
-                        }
-                    })
+                res.status(200).send({matches: row});
             }
         })
 })

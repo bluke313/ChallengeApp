@@ -2,6 +2,7 @@ import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { router } from 'expo-router';
 import { retrieveSecret } from '../Storage';
+import { colors } from '../../assets/theme';
 
 const getUsername = async () => {
     try {
@@ -90,31 +91,50 @@ export const UserFeed = ({ user, searchText }) => {
             const response = await fetch(
                 'http://localhost:3000/userFeed',
                 {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
                         Accept: 'application/json',
                         'content-Type': 'application/json',
                         authorization: `Bearer ${token}`,
-                        query: `${searchText}`,
                     },
+                    body: JSON.stringify({query: searchText})
                 }
             );
             const responseJson = await response.json();
-            setFeedData(responseJson);
+            setFeedData(responseJson.matches);
         } catch (err) {
             console.error(err);
         }
     }
 
-    useEffect(() => { fetchFeed() }, [searchText]);
+    useEffect(() => { searchText === '' ? setFeedData(null) : fetchFeed() }, [searchText]);
 
 
     return (
-        <View>
-            {feedData == null ? null : feedData.map( (data, i) =>  <Text key={i}>{data}</Text>)}
+        <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "16px"}}>
+            {feedData == null ? null : feedData.map( (data, i) =>  <UsernameLink key={i} username={data.username}/>)}
         </View>
     )
 };
+
+const UsernameLink = ({ username, ...rest }) => {
+    const styles = StyleSheet.create({
+        text: {
+            color: colors.text,
+            padding: "8px"
+        },
+        link: {
+            display: "block",
+            width: "200px"
+        }
+    })
+
+    return (
+        <Pressable style={styles.link} {...rest} onPress={() => router.push(`/p/${username}`)}>
+            <Text style={styles.text}>{username}</Text>
+        </Pressable>
+    )
+}
 
 
 const styles = StyleSheet.create({
