@@ -109,28 +109,54 @@ export const UserFeed = ({ user, searchText }) => {
 
     useEffect(() => { searchText === '' ? setFeedData(null) : fetchFeed() }, [searchText]);
 
+    const styles = StyleSheet.create({
+        container: {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 8,
+        }
+    })
 
     return (
-        <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "16px"}}>
-            {feedData == null ? null : feedData.map( (data, i) =>  <UsernameLink key={i} username={data.username}/>)}
+        
+        <View style={styles.container}>
+            {feedData == null ? null : (feedData.length == 0 ? <Text style={{opacity: '50%', color: colors.accent}}>No Results Found</Text> : feedData.map( (data, i) =>  <UsernameLink key={i} username={data.username}/>))}
         </View>
     )
 };
 
 const UsernameLink = ({ username, ...rest }) => {
+
+    const [hover, setHover] = useState(false);
+
     const styles = StyleSheet.create({
         text: {
             color: colors.text,
-            padding: "8px"
         },
         link: {
             display: "block",
-            width: "200px"
-        }
+            padding: 6,
+            borderWidth: 1,
+            borderRadius: 8,
+            borderColor: colors.secondary,
+            width: 200,
+            backgroundColor: 'rgba(255,255,255,.05)',
+        },
+        linkHover: {
+            display: "block",
+            padding: 6,
+            borderWidth: 1,
+            borderRadius: 8,
+            borderColor: colors.secondary,
+            width: 200,
+            backgroundColor: 'rgba(255,255,255,.25)',
+        },
     })
 
     return (
-        <Pressable style={styles.link} {...rest} onPress={() => router.push(`/p/${username}`)}>
+        <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => router.push(`/p/${username}`)}>
             <Text style={styles.text}>{username}</Text>
         </Pressable>
     )

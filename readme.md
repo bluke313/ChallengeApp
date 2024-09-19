@@ -13,6 +13,7 @@ Background: #030806
 Primary: #8bdbb3
 Secondary: #1f8a55
 Accent: #38c880
+Dark: #155c39
 
 
 Babel:
