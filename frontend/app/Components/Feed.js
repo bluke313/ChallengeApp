@@ -28,9 +28,10 @@ const getUsername = async () => {
 };
 
 const FeedImage = ({ image }) => {
+    console.log(image)
     return (
         <View style={styles.container}>
-            <Text>This is a FeedImage</Text>
+            <Text style={{color: "white"}}>This is a FeedImage</Text>
             <Pressable 
                 onPress={() => router.push(`i/${image.id}`)}
                 key={`${image.id}-image`}

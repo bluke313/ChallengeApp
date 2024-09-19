@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react'
 import { retrieveSecret } from '../../Storage.js'
 import { router, useGlobalSearchParams } from 'expo-router';
 import { Button, Tabs } from '@components/Button.js';
+import { whoAmI } from '../../Components/Network.js';
 
 export default function Challenge({ challenge }) {
     const [photoData, setPhotoData] = useState(null)
+    const [username, setUsername] = useState(null)
 
     const searchParams = useGlobalSearchParams()
     //consider a useEffect that calls /challenge which would serve comments, likes, etc
@@ -36,6 +38,7 @@ export default function Challenge({ challenge }) {
                 console.error(error);
             }
         }
+        whoAmI(setUsername)
         retrieveFullChallenge()
     }, [])
 
@@ -57,7 +60,7 @@ export default function Challenge({ challenge }) {
                     </View>}
             </View>
             
-            <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push('/')}/>
+            <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/>
 
         </View>
     )

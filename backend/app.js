@@ -341,7 +341,7 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
                 console.log(row)
                 let userId = row.id
                 db.all(`
-                        SELECT i.path, i.timestamp, i.caption, i.id FROM Images i 
+                        SELECT i.path, i.timestamp, i.caption, i.id, i.userId FROM Images i 
                         INNER JOIN Associations a
                         ON a.targetUserId = i.userId
                         WHERE a.type = 1 and a.userId = ${userId}
@@ -352,6 +352,7 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
                             res.status(500).send({ 'message': 'Database error!', 'success': false });
                         }
                         else {
+                            console.log(row)
                             res.status(200).send(formateImagePathsFromDBRows(row));
                         }
                     })

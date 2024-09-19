@@ -2,10 +2,12 @@ import { View, Text, StyleSheet, Image, Pressable, Button } from 'react-native';
 import { useEffect, useState } from 'react'
 import {retrieveSecret} from '../Storage.js'
 import { router, Link, useGlobalSearchParams } from 'expo-router';
+import { whoAmI } from '../Components/Network.js';
 
 
 export const ChallengesView = ({user, fresh}) => {
     const [challenges, setChallenges] = useState([])
+    const [username, setUsername] = useState(null)
     const localParams = useGlobalSearchParams()
     // console.log(`params: ${localParams.id}`)
 
@@ -36,6 +38,7 @@ export const ChallengesView = ({user, fresh}) => {
                 console.error(error);
             }
         }
+        whoAmI(setUsername)
         fetchProfile()
     }, [fresh])
     return (
