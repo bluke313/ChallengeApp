@@ -206,31 +206,46 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                     res.status(500).send({ "message": "Database error!", "success": false })
                     return
                 }
-                if(ownProfile){
-                    res.status(200).send({ "username": req.body.userId.userId, "bio": row ? row.bio : null, "images": imagePaths, "ownProfile": ownProfile })
-                }
-                else {
-                    const prevRow = row
-                    //gets association status if it's someone else's profile
-                    db.get(`
-                        SELECT Associations.type FROM Associations
-                        INNER JOIN Users
-                        ON Users.id = Associations.userId
-                        WHERE Users.username = '${req.body.userId.userId}'
-                        AND Associations.targetUserId = (SELECT id FROM Users WHERE username = '${req.body.pageUserName}');
-                    `, async (err, row) =>{
-                        if (err) {
-                            console.log(`/profile ERROR: ${err}`);
-                            res.status(500).send({ "message": "Database error!", "success": false })
-                            return
-                        }
-                        let friends = -1 //-1 means no association
-                        if(row !== undefined){
-                            friends = row.type
-                        }
-                        res.status(200).send({ "username": req.body.userId.userId, "bio": prevRow ? prevRow.bio : null, "images": imagePaths, "ownProfile": ownProfile, "friends": friends })
-                        
-                    })
+                else { // get amount of friends
+                    const bioRow = row
+                    db.get(`SELECT COUNT(*) as friendCount FROM Associations WHERE userId = (SELECT id from Users where username = '${req.body.pageUserName}') and type = 1;`,
+                        async (err, row) => {
+                            if (err) {
+                                console.log(`/profile ERROR: ${err}`);
+                                res.status(500).send({ "message": "Database error!", "success": false })
+                                return
+                            }
+                            if(ownProfile){
+                                console.log(bioRow)
+                                res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friendCount": row.friendCount})
+                            }
+                            else {
+                                const friendCountRow = row
+
+                                //gets association status if it's someone else's profile
+                                db.get(`
+                                    SELECT Associations.type FROM Associations
+                                    INNER JOIN Users
+                                    ON Users.id = Associations.userId
+                                    WHERE Users.username = '${req.body.userId.userId}'
+                                    AND Associations.targetUserId = (SELECT id FROM Users WHERE username = '${req.body.pageUserName}');
+                                `, async (err, row) =>{
+                                    if (err) {
+                                        console.log(`/profile ERROR: ${err}`);
+                                        res.status(500).send({ "message": "Database error!", "success": false })
+                                        return
+                                    }
+                                    let friends = -1 //-1 means no association
+                                    if(row !== undefined){
+                                        friends = row.type
+                                    }
+                                    console.log("this is bio")
+                                    console.log(bioRow)
+                                    res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friends": friends, "friendCount": friendCountRow.friendCount })
+                                    
+                                })
+                            }
+                        })
                 }
 
                 return

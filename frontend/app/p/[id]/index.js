@@ -1,6 +1,6 @@
-import { View, TextInput, Text, StyleSheet, Pressable, ScrollView, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, Pressable, ScrollView, Image, Modal } from 'react-native';
 import { useEffect, useRef, useState } from 'react'
-import { router, useGlobalSearchParams } from 'expo-router';
+import { Link, router, useGlobalSearchParams } from 'expo-router';
 import { shouldUseActivityState } from 'react-native-screens';
 
 
@@ -11,13 +11,22 @@ import PhotoUpload from '@components/PhotoUpload.js';
 import { retrieveSecret } from '../../Storage.js'
 import { ChallengesView } from '../../Challenge/Challenge.js'
 import { Button, Tabs } from '@components/Button.js';
+import { StyledTextInput } from '@components/Input.js'
+
+function GroupModal() {
+    return (
+        <View><Text>Hello Groups!</Text></View>
+    )
+}
 
 const Profile = () => {
     const [active, setActive] = useState(0)
+    const [friendCount, setFriendCount] = useState(0)
     const [user, setUser] = useState(null)
-    const [bio, setBio] = useState(null)
+    const [bio, setBio] = useState("")
     const [fresh, setFresh] = useState(true)
     const [ownPage, setOwnPage] = useState(false)
+    const [modalShown, setModalShown] = useState(false)
     const [friendStatus, setFriendStatus] = useState(-1) //0 pending 1 friend 2 blocked
     const bioRef = useRef(null)
     const scrollViewRef = useRef(null);
@@ -55,6 +64,7 @@ const Profile = () => {
                 setUser(responseJson.username)
                 setBio(responseJson.bio)
                 setOwnPage(responseJson.ownProfile)
+                setFriendCount(responseJson.friendCount)
                 if(!responseJson.ownProfile){
                     console.log("setting friend status to: " + responseJson.friends)
                     setFriendStatus(responseJson.friends)
@@ -71,13 +81,15 @@ const Profile = () => {
 
 
     const AddBio = () => {
+        const [text, setText] = useState("")
+
         return (
             <View style={styles.addBioView}>
-                <TextInput
-                    style={styles.input}
+                <StyledTextInput
                     placeholder="Add a nifty bio!"
-                    value={bio}
-                    ref={bioRef}
+                    value={text}
+                    onChangeText={setText}
+                    // ref={bioRef}
                 />
                 <Pressable onPress={() => {
                     const saveBio = async () => {
@@ -94,7 +106,7 @@ const Profile = () => {
                                         authorization: `Bearer ${token}`
                                     },
                                     body: JSON.stringify({
-                                        "bio": bioRef.current.value
+                                        "bio": text
                                     }),
                                 }
                             );
@@ -191,9 +203,19 @@ const Profile = () => {
 
                 <View style={styles.infoView}>
                     <Text style={styles.header1}>{glob.id}</Text>
-                    {bio == null && ownPage ? <AddBio /> : bio == null ? null : <Text style={styles.bio}>{bio}</Text>}
+                    {bio == "" && ownPage ? <AddBio /> : bio == "" ? null : <Text style={styles.bio}>{bio}</Text>}
                     <View>
-                        <Button text='13 Group Mates' />
+                        <Button text={`${friendCount} Group Mates`} onPress={() => setModalShown(!modalShown)} />
+                        <Modal
+                            animationType="slide"
+                            transparent={false}
+                            visible={modalShown}
+                            onRequestClose={() => {
+                            setModalVisible(!modalShown);
+                        }}>
+                            <GroupModal />
+                            <Button text={"close modal"} onPress={() => setModalShown(false)}/>
+                        </Modal>
                         <SocialButton />
                     </View>
                     <View style={styles.bufferStyle}></View>
