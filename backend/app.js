@@ -257,12 +257,16 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
 function formateImagePathsFromDBRows(rows) {
     let paths = []
     for (let i = 0; i < rows.length; i++) {
-        paths.push({
+        let obj = {
             "path": rows[i].path.slice(7),
             "caption": rows[i].caption,
             "timestamp": rows[i].timestamp,
-            "id": rows[i].id
-        })
+            "id": rows[i].id        
+        }
+        if (Object.keys(rows[i]).includes("username")){
+            obj["username"] = rows[i].username
+        }
+        paths.push(obj)
     }
 
     return paths
@@ -341,9 +345,11 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
                 console.log(row)
                 let userId = row.id
                 db.all(`
-                        SELECT i.path, i.timestamp, i.caption, i.id, i.userId FROM Images i 
+                        SELECT i.path, i.timestamp, i.caption, i.id, i.userId, u.username FROM Images i 
                         INNER JOIN Associations a
                         ON a.targetUserId = i.userId
+                        INNER JOIN Users u
+                        ON a.targetUserId = u.id
                         WHERE a.type = 1 and a.userId = ${userId}
                         ORDER BY i.timestamp;`,
                     async (err, row) => {

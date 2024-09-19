@@ -1,12 +1,14 @@
-import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Pressable, StyleSheet, ScrollView, Modal } from 'react-native';
 import { router } from 'expo-router';
 import { dropSecret, retrieveSecret } from './Storage.js';
 import { Feed } from '@components/Feed.js';
 import { useState, useEffect, useRef } from 'react';
 import { Button, Tabs } from '@components/Button.js';
+import Search from './Search.js';
 
 const home = () => {
     const [username, setUsername] = useState('');
+    const [modalShown, setModalShown] = useState(false);
     const scrollViewRef = useRef(null);
 
     // Reset user view to top of screen
@@ -50,7 +52,16 @@ const home = () => {
 
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <Text style={styles.title}>Home Page</Text>
-                <Button onPress={() => router.push('/Search')} text='Search'/>
+                <Button onPress={() => setModalShown(true)} text='Search'/>
+                <Modal
+                            animationType="slide"
+                            transparent={true}
+                            visible={modalShown}
+                            onRequestClose={() => {
+                            setModalShown(!modalShown);
+                }}>
+                    <Search onClose={() => setModalShown(false)}/>
+                </Modal>
                 <Button onPress={() => { dropSecret('authToken'); router.push('/Login') }} text='Sign Out' />
                 <Feed user={username} />
             </ScrollView>

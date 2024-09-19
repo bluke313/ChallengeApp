@@ -1,8 +1,9 @@
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { retrieveSecret } from '../Storage';
 import { colors } from '../../assets/theme';
+import { Icon } from 'react-native-elements';
 
 const getUsername = async () => {
     try {
@@ -31,7 +32,7 @@ const FeedImage = ({ image }) => {
     console.log(image)
     return (
         <View style={styles.container}>
-            <Text style={{color: "white"}}>This is a FeedImage</Text>
+            <Link style={{color: "white"}} href={`/p/${image.username}`}>{image.username}</Link>
             <Pressable 
                 onPress={() => router.push(`i/${image.id}`)}
                 key={`${image.id}-image`}
@@ -82,7 +83,7 @@ export const Feed = ({ user }) => {
     )
 };
 
-export const UserFeed = ({ user, searchText }) => {
+export const UserFeed = ({onClose, user, searchText }) => {
 
     const [feedData, setFeedData] = useState(null);
 
@@ -123,12 +124,12 @@ export const UserFeed = ({ user, searchText }) => {
     return (
         
         <View style={styles.container}>
-            {feedData == null ? null : (feedData.length == 0 ? <Text style={{opacity: '50%', color: colors.accent}}>No Results Found</Text> : feedData.map( (data, i) =>  <UsernameLink key={i} username={data.username}/>))}
+            {feedData == null ? null : (feedData.length == 0 ? <Text style={{opacity: '50%', color: colors.accent}}>No Results Found</Text> : feedData.map( (data, i) =>  <UsernameLink onClose={onClose} key={i} username={data.username}/>))}
         </View>
     )
 };
 
-const UsernameLink = ({ username, ...rest }) => {
+const UsernameLink = ({ onClose, username, ...rest }) => {
 
     const [hover, setHover] = useState(false);
 
@@ -137,7 +138,10 @@ const UsernameLink = ({ username, ...rest }) => {
             color: colors.text,
         },
         link: {
-            display: "block",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
             padding: 6,
             borderWidth: 1,
             borderRadius: 8,
@@ -146,7 +150,10 @@ const UsernameLink = ({ username, ...rest }) => {
             backgroundColor: 'rgba(255,255,255,.05)',
         },
         linkHover: {
-            display: "block",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
             padding: 6,
             borderWidth: 1,
             borderRadius: 8,
@@ -154,11 +161,17 @@ const UsernameLink = ({ username, ...rest }) => {
             width: 200,
             backgroundColor: 'rgba(255,255,255,.25)',
         },
+        plusView: {
+            display: "block",
+            width: "25px",
+            height: "25px"
+        }
     })
 
     return (
-        <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => router.push(`/p/${username}`)}>
+        <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => {onClose(); router.push(`/p/${username}`);}}>
             <Text style={styles.text}>{username}</Text>
+            <View style={styles.plusView}><Icon name='plus' type='feather' color={colors.accent}/></View>
         </Pressable>
     )
 }
@@ -167,7 +180,12 @@ const UsernameLink = ({ username, ...rest }) => {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        paddingBottom: "100px"
+        marginBottom: "100px",
+        padding: 16,
+        backgroundColor: "rgba(255,255,255,.15)",
+        borderColor: colors.secondary,
+        borderWidth: 1,
+        borderRadius: "10px"
     },
     title: {
         fontSize: 24,
@@ -190,7 +208,7 @@ const styles = StyleSheet.create({
         width: 350,
         height: 400,
         borderWidth: 2,
-        borderColor: '#38c880',
+        // borderColor: '#38c880',
         backgroundColor: 'white',
     },
     caption: {
