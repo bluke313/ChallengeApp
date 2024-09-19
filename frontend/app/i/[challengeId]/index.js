@@ -57,7 +57,7 @@ export default function Challenge({ challenge }) {
                     </View>}
             </View>
             
-            <Tabs handleHome={() => router.push('/home')} />
+            <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push('/')}/>
 
         </View>
     )

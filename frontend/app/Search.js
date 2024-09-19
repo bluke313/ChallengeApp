@@ -11,6 +11,7 @@ const Search = () => {
 
     const [searchText, setSearchText] = useState('');
 
+    
 
     return (
         <View style={styles.container}>
@@ -23,6 +24,7 @@ const Search = () => {
                 />
                 <UserFeed searchText={searchText}/>
             </ScrollView>
+            <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/>
         </View>
     );
 
