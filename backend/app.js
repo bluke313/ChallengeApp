@@ -431,6 +431,10 @@ router.route('/associationRequest').post(authenticateToken, async (req, res) => 
     }
 })
 
+router.route('/whoami').get(authenticateToken, async (req, res) => {
+    res.status(200).send({"username": req.body.userId.userId})
+})
+
 app.use(express.static('public'));
 
 

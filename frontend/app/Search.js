@@ -1,15 +1,19 @@
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
-import { dropSecret, retrieveSecret } from './Storage.js';
-import { Feed } from '@components/Feed.js';
 import { useState, useEffect, useRef } from 'react';
 import { Button, Tabs } from '@components/Button.js';
 import { StyledTextInput } from '@components/Input.js';
 import { UserFeed } from '@components/Feed.js';
+import { whoAmI } from './Components/Network.js';
 
 const Search = () => {
 
     const [searchText, setSearchText] = useState('');
+    const [username, setUsername] = useState(null);
+    
+    useEffect(() => {
+        whoAmI(setUsername)
+    }, [])
 
     
 
