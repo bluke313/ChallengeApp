@@ -171,7 +171,7 @@ const UsernameLink = ({ onClose, username, ...rest }) => {
     return (
         <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => {onClose(); router.push(`/p/${username}`);}}>
             <Text style={styles.text}>{username}</Text>
-            <View style={styles.plusView}><Icon name='plus' type='feather' color={colors.accent}/></View>
+            <Pressable style={styles.plusView}><Icon name='account-plus' type='material-community' color={colors.accent}/></Pressable>
         </Pressable>
     )
 }
