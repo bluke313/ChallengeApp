@@ -25,7 +25,7 @@ const Profile = () => {
     const [user, setUser] = useState(null)
     const [bio, setBio] = useState("")
     const [fresh, setFresh] = useState(true)
-    const [ownPage, setOwnPage] = useState(false)
+    const [ownProfile, setOwnProfile] = useState(false)
     const [modalShown, setModalShown] = useState(false)
     const [friendStatus, setFriendStatus] = useState(-2) //-2 default (own profile or not loaded) -1 not friends 0 pending 1 friend 2 blocked
     const bioRef = useRef(null)
@@ -63,7 +63,7 @@ const Profile = () => {
                 console.log(responseJson)
                 setUser(responseJson.username)
                 setBio(responseJson.bio)
-                setOwnPage(responseJson.ownProfile)
+                setOwnProfile(responseJson.ownProfile)
                 setFriendCount(responseJson.friendCount)
                 if(!responseJson.ownProfile){
                     console.log("setting friend status to: " + responseJson.friends)
@@ -126,7 +126,7 @@ const Profile = () => {
     }
 
     const ProfileData = () => {
-        if(!ownPage){
+        if(!ownProfile){
             return (
                 <View>
                     <ChallengesView user={glob.id} fresh={fresh} />
@@ -206,7 +206,7 @@ const Profile = () => {
 
                 <View style={styles.infoView}>
                     <Text style={styles.header1}>{glob.id}</Text>
-                    {bio == "" && ownPage ? <AddBio /> : bio == "" ? null : <Text style={styles.bio}>{bio}</Text>}
+                    {bio == "" && ownProfile ? <AddBio /> : bio == "" ? null : <Text style={styles.bio}>{bio}</Text>}
                     <View style={styles.socialButtonView}>
                         <Button style={{flexGrow: 1}} text={`${friendCount} Group Mates`} onPress={() => setModalShown(!modalShown)} />
                         <Modal
@@ -227,7 +227,7 @@ const Profile = () => {
 
             </ScrollView>
 
-            <Tabs handleHome={() => router.push('/home')} handleProfile={scrollToTop} />
+            <Tabs handleHome={() => {setFresh(false); router.push('/home')}} handleProfile={() => {ownProfile ? scrollToTop : router.push(`/p/${user}`)}} />
 
         </View>
     );
