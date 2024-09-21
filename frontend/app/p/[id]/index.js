@@ -179,17 +179,17 @@ const Profile = () => {
         }
         if(friendStatus == -1){
             return (
-                <Button onPress={() => sendAssociationRequest(0)} text='Add Friend' />
+                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(0)} text='Add Friend' />
             )
         }
         else if(friendStatus == 0) {
             return (
-                <Button onPress={() => sendAssociationRequest(-1)} text='Cancel Friend Request' />
+                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(-1)} text='Cancel Friend Request' />
             )
         }
         else {
             return (
-                <Button onPress={() => sendAssociationRequest(-1)} text='Remove Friend' />
+                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(-1)} text='Remove Friend' />
             )
         }
     }
@@ -207,8 +207,8 @@ const Profile = () => {
                 <View style={styles.infoView}>
                     <Text style={styles.header1}>{glob.id}</Text>
                     {bio == "" && ownPage ? <AddBio /> : bio == "" ? null : <Text style={styles.bio}>{bio}</Text>}
-                    <View>
-                        <Button text={`${friendCount} Group Mates`} onPress={() => setModalShown(!modalShown)} />
+                    <View style={styles.socialButtonView}>
+                        <Button style={{flexGrow: 1}} text={`${friendCount} Group Mates`} onPress={() => setModalShown(!modalShown)} />
                         <Modal
                             animationType="slide"
                             transparent={false}
@@ -300,6 +300,11 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
     },
+    socialButtonView: {
+        display: "flex",
+        flexDirection: "row",
+        // justifyContent: "space-between"
+    }
 });
 
 export default Profile;

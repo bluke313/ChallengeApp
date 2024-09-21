@@ -85,7 +85,7 @@ export const Tabs = ({ handleHome, handleProfile }) => {
 };
 
 
-export const Button = ({ text, disabled, ...rest }) => {
+export const Button = ({style, text, disabled, ...rest }) => {
   const styles = StyleSheet.create({
       button: {
           backgroundColor: colors.secondary,
@@ -93,6 +93,7 @@ export const Button = ({ text, disabled, ...rest }) => {
           alignItems: 'center',
           borderRadius: 5,
           margin: 5,
+          // flexGrow: 1
       },
       disabledButton: {
           backgroundColor: colors.secondary,
@@ -109,7 +110,7 @@ export const Button = ({ text, disabled, ...rest }) => {
   })
   
   return (
-      <Pressable style={disabled ? styles.disabledButton : styles.button} {...rest}>
+      <Pressable style={disabled ? {...styles.disabledButton, ...style} : {...styles.button, ...style}} {...rest}>
           <Text style={styles.buttonText}>{text}</Text>
       </Pressable>
   )
