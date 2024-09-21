@@ -192,65 +192,65 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
         where Users.username = '${req.body.pageUserName}'
         order by Images.timestamp;
         `, async (err, row) => {
-            const ownProfile = req.body.pageUserName === req.body.userId.userId
+        const ownProfile = req.body.pageUserName === req.body.userId.userId
+        if (err) {
+            console.log(`/profile ERROR: ${err}`);
+            res.status(500).send({ "message": "Database error!", "success": false })
+            return
+        }
+        const imagePaths = formateImagePathsFromDBRows(row)
+
+        db.get(`select bio from Users where username = '${req.body.pageUserName}';`, async (err, row) => {
             if (err) {
                 console.log(`/profile ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false })
                 return
             }
-            const imagePaths = formateImagePathsFromDBRows(row)
+            else { // get amount of friends
+                const bioRow = row
+                db.get(`SELECT COUNT(*) as friendCount FROM Associations WHERE userId = (SELECT id from Users where username = '${req.body.pageUserName}') and type = 1;`,
+                    async (err, row) => {
+                        if (err) {
+                            console.log(`/profile ERROR: ${err}`);
+                            res.status(500).send({ "message": "Database error!", "success": false })
+                            return
+                        }
+                        if (ownProfile) {
+                            console.log(bioRow)
+                            res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friendCount": row.friendCount })
+                        }
+                        else {
+                            const friendCountRow = row
 
-            db.get(`select bio from Users where username = '${req.body.pageUserName}';`, async (err, row) => {
-                if (err) {
-                    console.log(`/profile ERROR: ${err}`);
-                    res.status(500).send({ "message": "Database error!", "success": false })
-                    return
-                }
-                else { // get amount of friends
-                    const bioRow = row
-                    db.get(`SELECT COUNT(*) as friendCount FROM Associations WHERE userId = (SELECT id from Users where username = '${req.body.pageUserName}') and type = 1;`,
-                        async (err, row) => {
-                            if (err) {
-                                console.log(`/profile ERROR: ${err}`);
-                                res.status(500).send({ "message": "Database error!", "success": false })
-                                return
-                            }
-                            if(ownProfile){
-                                console.log(bioRow)
-                                res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friendCount": row.friendCount})
-                            }
-                            else {
-                                const friendCountRow = row
-
-                                //gets association status if it's someone else's profile
-                                db.get(`
+                            //gets association status if it's someone else's profile
+                            db.get(`
                                     SELECT Associations.type FROM Associations
                                     INNER JOIN Users
                                     ON Users.id = Associations.userId
                                     WHERE Users.username = '${req.body.userId.userId}'
                                     AND Associations.targetUserId = (SELECT id FROM Users WHERE username = '${req.body.pageUserName}');
-                                `, async (err, row) =>{
-                                    if (err) {
-                                        console.log(`/profile ERROR: ${err}`);
-                                        res.status(500).send({ "message": "Database error!", "success": false })
-                                        return
-                                    }
-                                    let friends = -1 //-1 means no association
-                                    if(row !== undefined){
-                                        friends = row.type
-                                    }
-                                    console.log("this is bio")
-                                    console.log(bioRow)
-                                    res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friends": friends, "friendCount": friendCountRow.friendCount })
-                                    
-                                })
-                            }
-                        })
-                }
+                                `, async (err, row) => {
+                                if (err) {
+                                    console.log(`/profile ERROR: ${err}`);
+                                    res.status(500).send({ "message": "Database error!", "success": false })
+                                    return
+                                }
+                                let friends = -1 //-1 means no association
+                                if (row !== undefined) {
+                                    friends = row.type
+                                }
+                                console.log("this is bio")
+                                console.log(bioRow)
+                                res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friends": friends, "friendCount": friendCountRow.friendCount })
 
-                return
-            })
+                            })
+                        }
+                    })
+            }
+
             return
+        })
+        return
     })
 })
 
@@ -261,9 +261,9 @@ function formateImagePathsFromDBRows(rows) {
             "path": rows[i].path.slice(7),
             "caption": rows[i].caption,
             "timestamp": rows[i].timestamp,
-            "id": rows[i].id        
+            "id": rows[i].id
         }
-        if (Object.keys(rows[i]).includes("username")){
+        if (Object.keys(rows[i]).includes("username")) {
             obj["username"] = rows[i].username
         }
         paths.push(obj)
@@ -335,7 +335,7 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
     // currentUserId = req.userId
     // db.get(`SELECT path, timestamp, caption, id FROM Images WHERE userId IN (SELECT friendId FROM Friends WHERE userID = :currentUserId)`)
     // console.log('Getting feed...');
-    db.get(`SELECT id FROM Users WHERE username = '${req.body.userId.userId}';`, 
+    db.get(`SELECT id FROM Users WHERE username = '${req.body.userId.userId}';`,
         async (err, row) => {
             if (err) {
                 console.log(`/feed ERROR: ${err}`);
@@ -367,16 +367,39 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
 })
 
 router.route('/userFeed').post(authenticateToken, async (req, res) => {
-    db.all(`SELECT id, username FROM Users WHERE username LIKE '%${req.body.query}%';`, 
-        async (err, row) => {
-            if (err) {
-                console.log(`/userFeed ERROR: ${err}`);
-                res.status(500).send({ 'message': 'Database error!', 'success': false });
-            }
-            else {
-                res.status(200).send({matches: row});
-            }
-        })
+    //priority query for current friends or former associates
+    db.all(`SELECT u.id, u.username, a.type FROM Associations a
+            INNER JOIN Users u
+            ON u.id = a.targetUserId
+            WHERE a.userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)}
+            AND u.username LIKE '%${req.body.query}%';`, async (err, row) => {
+        if (err) {
+            console.log(`/userFeed associate query ERROR: ${err}`);
+            res.status(500).send({ 'message': 'Database error!', 'success': false });
+        }
+        else {
+            let matches = row
+            let exclusionString = matches.map((m) => m.id).join(',')
+
+            //query to get all user's matching
+            db.all(`SELECT id, username FROM Users
+                    WHERE username LIKE '%${req.body.query}%' AND id NOT IN (${exclusionString});`,
+                async (err, row) => {
+                    if (err) {
+                        console.log(`/userFeed non-associate query ERROR: ${err}`);
+                        res.status(500).send({ 'message': 'Database error!', 'success': false });
+                    }
+                    else {
+                        let newMatches = row.map((elem) => ({...elem, type: -1}))
+                        matches = [...matches, ...newMatches]
+                        res.status(200).send({ matches: matches });
+                    }
+                })
+        }
+    })
+
+
+
 })
 
 function getSQLStringUserIdFromUsername(username) {
@@ -386,60 +409,60 @@ function getSQLStringUserIdFromUsername(username) {
 router.route('/associationRequest').post(authenticateToken, async (req, res) => {
     let newFriends = req.body.currentCode
 
-    if(req.body.currentCode == 0 && req.body.code == -1){ //cancel friend request
+    if (req.body.currentCode == 0 && req.body.code == -1) { //cancel friend request
         db.run(`DELETE FROM Associations
                 WHERE userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)} 
                 AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)};`,
-                async (err) => {
-                    newFriends = -1
-                    res.status(200).send({"message": "updated association", "friends": newFriends})
-                })
+            async (err) => {
+                newFriends = -1
+                res.status(200).send({ "message": "updated association", "friends": newFriends })
+            })
     }
-    if(req.body.currentCode == -1 && req.body.code == 0){ //no existing friendship but a request is made
+    if (req.body.currentCode == -1 && req.body.code == 0) { //no existing friendship but a request is made
         //first check if the target has a pending request on you
         db.get(`
             SELECT type FROM Associations WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)}
             AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};
         `, async (err, row) => {
-            if(err) {
+            if (err) {
                 console.log(`/associationRequest ERROR: ${err}`);
                 res.status(500).send({ 'message': 'Database error!', 'success': false });
             }
             else {
-                if(row === undefined){
+                if (row === undefined) {
                     //no prior request so we make a pending friendship
                     db.run(`INSERT INTO Associations (timestamp, targetUserId, userId, type)
                             VALUES ('2024-71-18 13:43:18', ${getSQLStringUserIdFromUsername(req.body.pageUserName)}, ${getSQLStringUserIdFromUsername(req.body.userId.userId)}, 0);`)
                     newFriends = 0
                 }
-                else if (row.type == 0){
+                else if (row.type == 0) {
                     db.run(`INSERT INTO Associations (timestamp, targetUserId, userId, type)
                             VALUES ('2024-71-18 13:43:18', ${getSQLStringUserIdFromUsername(req.body.pageUserName)}, ${getSQLStringUserIdFromUsername(req.body.userId.userId)}, 1);`)
                     db.run(`UPDATE Associations SET type = 1
                             WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)} AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};`)
                     newFriends = 1
                 }
-                res.status(200).send({"message": "updated association", "friends": newFriends})
+                res.status(200).send({ "message": "updated association", "friends": newFriends })
                 return
             }
         })
     }
-    if(req.body.currentCode == 1){ //remove existing friendship
+    if (req.body.currentCode == 1) { //remove existing friendship
         db.run(`DELETE FROM Associations
                 WHERE userId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)} 
                 AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};`)
         db.run(`DELETE FROM Associations
                 WHERE userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)} 
                 AND targetUserId = ${getSQLStringUserIdFromUsername(req.body.pageUserName)};`,
-                async (err) => {
-                    newFriends = -1
-                    res.status(200).send({"message": "updated association", "friends": newFriends})
-                })
+            async (err) => {
+                newFriends = -1
+                res.status(200).send({ "message": "updated association", "friends": newFriends })
+            })
     }
 })
 
 router.route('/whoami').get(authenticateToken, async (req, res) => {
-    res.status(200).send({"username": req.body.userId.userId})
+    res.status(200).send({ "username": req.body.userId.userId })
 })
 
 app.use(express.static('public'));
