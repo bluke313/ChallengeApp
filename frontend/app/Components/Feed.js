@@ -124,14 +124,33 @@ export const UserFeed = ({onClose, user, searchText }) => {
     return (
         
         <View style={styles.container}>
-            {feedData == null ? null : (feedData.length == 0 ? <Text style={{opacity: '50%', color: colors.accent}}>No Results Found</Text> : feedData.map( (data, i) =>  <UsernameLink onClose={onClose} key={i} username={data.username}/>))}
+            {feedData == null ? null : (feedData.length == 0 ? <Text style={{opacity: '50%', color: colors.accent}}>No Results Found</Text> : feedData.map( (data, i) =>  <UsernameLink onClose={onClose} key={i} data={data}/>))}
         </View>
     )
 };
 
-const UsernameLink = ({ onClose, username, ...rest }) => {
+const UsernameLink = ({ onClose, data, ...rest }) => {
 
     const [hover, setHover] = useState(false);
+
+    const SocialButton = (friendStatus) => {
+        console.log(friendStatus.friendStatus)
+        if(friendStatus.friendStatus == -1){
+            return (
+                <Pressable onPress={() => sendAssociationRequest(0)} style={styles.plusView}><Icon name='account-plus' type='material-community' color={"gray"}/></Pressable>
+            )
+        }
+        else if(friendStatus.friendStatus == 0) {
+            return (
+                <Pressable onPress={() => sendAssociationRequest(-1)} style={styles.plusView}><Icon name='account-clock' type='material-community' color={"orange"}/></Pressable>
+            )
+        }
+        else {
+            return (
+                <Pressable onPress={() => sendAssociationRequest(-1)} style={styles.plusView}><Icon name='account-heart' type='material-community' color={colors.accent}/></Pressable>
+            )
+        }
+    }
 
     const styles = StyleSheet.create({
         text: {
@@ -169,9 +188,9 @@ const UsernameLink = ({ onClose, username, ...rest }) => {
     })
 
     return (
-        <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => {onClose(); router.push(`/p/${username}`);}}>
-            <Text style={styles.text}>{username}</Text>
-            <Pressable style={styles.plusView}><Icon name='account-plus' type='material-community' color={colors.accent}/></Pressable>
+        <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => {onClose(); router.push(`/p/${data.username}`);}}>
+            <Text style={styles.text}>{data.username}</Text>
+            <SocialButton friendStatus={data.type} />
         </Pressable>
     )
 }
