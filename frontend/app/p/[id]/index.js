@@ -27,7 +27,7 @@ const Profile = () => {
     const [fresh, setFresh] = useState(true)
     const [ownPage, setOwnPage] = useState(false)
     const [modalShown, setModalShown] = useState(false)
-    const [friendStatus, setFriendStatus] = useState(-1) //0 pending 1 friend 2 blocked
+    const [friendStatus, setFriendStatus] = useState(-2) //-2 default (own profile or not loaded) -1 not friends 0 pending 1 friend 2 blocked
     const bioRef = useRef(null)
     const scrollViewRef = useRef(null);
 
@@ -174,6 +174,9 @@ const Profile = () => {
     }
 
     const SocialButton = () => {
+        if(friendStatus == -2){
+            return null
+        }
         if(friendStatus == -1){
             return (
                 <Button onPress={() => sendAssociationRequest(0)} text='Add Friend' />
