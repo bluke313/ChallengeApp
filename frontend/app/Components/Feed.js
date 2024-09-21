@@ -4,6 +4,7 @@ import { Link, router } from 'expo-router';
 import { retrieveSecret } from '../Storage';
 import { colors } from '../../assets/theme';
 import { Icon } from 'react-native-elements';
+import { sendAssociationRequest } from '@components/Network.js'
 
 const getUsername = async () => {
     try {
@@ -130,24 +131,23 @@ export const UserFeed = ({onClose, user, searchText }) => {
 };
 
 const UsernameLink = ({ onClose, data, ...rest }) => {
-
     const [hover, setHover] = useState(false);
+    const [friendStatus, setFriendStatus] = useState(data.type)
 
-    const SocialButton = (friendStatus) => {
-        console.log(friendStatus.friendStatus)
-        if(friendStatus.friendStatus == -1){
+    const SocialButton = () => {
+        if(friendStatus == -1){
             return (
-                <Pressable onPress={() => sendAssociationRequest(0)} style={styles.plusView}><Icon name='account-plus' type='material-community' color={"gray"}/></Pressable>
+                <Pressable onPress={() => sendAssociationRequest(0, friendStatus, data.username, setFriendStatus)} style={styles.plusView}><Icon name='account-plus' type='material-community' color={"gray"}/></Pressable>
             )
         }
-        else if(friendStatus.friendStatus == 0) {
+        else if(friendStatus == 0) {
             return (
-                <Pressable onPress={() => sendAssociationRequest(-1)} style={styles.plusView}><Icon name='account-clock' type='material-community' color={"orange"}/></Pressable>
+                <Pressable onPress={() => sendAssociationRequest(-1, friendStatus, data.username, setFriendStatus)} style={styles.plusView}><Icon name='account-clock' type='material-community' color={"orange"}/></Pressable>
             )
         }
         else {
             return (
-                <Pressable onPress={() => sendAssociationRequest(-1)} style={styles.plusView}><Icon name='account-heart' type='material-community' color={colors.accent}/></Pressable>
+                <View style={styles.plusView}><Icon name='account-heart' type='material-community' color={colors.accent}/></View>
             )
         }
     }

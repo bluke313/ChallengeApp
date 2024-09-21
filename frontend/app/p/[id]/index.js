@@ -12,6 +12,7 @@ import { retrieveSecret } from '../../Storage.js'
 import { ChallengesView } from '../../Challenge/Challenge.js'
 import { Button, Tabs } from '@components/Button.js';
 import { StyledTextInput } from '@components/Input.js'
+import { sendAssociationRequest } from '@components/Network.js'
 
 function GroupModal() {
     return (
@@ -145,41 +146,13 @@ const Profile = () => {
         )
     }
 
-    const sendAssociationRequest = async (code) => {
-        try {
-            const token = await retrieveSecret('authToken')
-            console.log(`Token: ${token}`)
-            const response = await fetch(
-                'http://localhost:3000/associationRequest',
-                {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        "code": code,
-                        "currentCode": friendStatus,
-                        "pageUserName": glob.id
-                    }),
-                }
-            );
-            const responseJson = await response.json();
-            setFriendStatus(responseJson.friends)
-            // console.log(responseJson)
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     const SocialButton = () => {
         if(friendStatus == -2){
             return null
         }
         if(friendStatus == -1){
             return (
-                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(0)} text='Add Friend' />
+                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(0, friendStatus, glob.id, setFriendStatus)} text='Add Friend' />
             )
         }
         else if(friendStatus == 0) {
