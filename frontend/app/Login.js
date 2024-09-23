@@ -13,6 +13,7 @@ const Login = (props) => {
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
     const [allowLogin, setAllowLogin] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -64,24 +65,6 @@ const Login = (props) => {
         }
     };
 
-    // const checkEmail = () => {
-    //     if (!emailPattern.test(email)) {
-    //         setEmailErr(true);
-    //     }
-    //     else {
-    //         setEmailErr(false);
-    //     }
-    // };
-
-    // const checkPassword = () => {
-    //     if (!password) {
-    //         setPasswordErr(true);
-    //     }
-    //     else {
-    //         setPasswordErr(false);
-    //     }
-    // };
-
     const handleKeyPress = (e) => {
         if (e.nativeEvent.key === 'Enter') {
             e.preventDefault();
@@ -99,21 +82,24 @@ const Login = (props) => {
 
         <View style={styles.container}>
             <Text style={styles.title}>Login</Text>
-            <StyledTextInput 
+            <StyledTextInput
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
                 onKeyPress={handleKeyPress}
             />
-            <SecureTextinput 
+            <SecureTextinput
                 placeholder="Password"
                 value={password}
                 onChangeText={setPassword}
                 onKeyPress={handleKeyPress}
             />
-            <Button text='Login' onPress={handleLogin} disabled={!allowLogin}/>
-            <Link style={styles.link} href='/SignUp'>
-                <Text style={styles.linkText}>Sign Up</Text>
+            <Button text='Login' onPress={handleLogin} disabled={!allowLogin} />
+            <Link style={isHovered ? styles.link : styles.link} href='/SignUp'>
+                <Text
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={isHovered ? {color: '#8bdbb3', textDecorationLine: 'underline'} : styles.linkText}>Sign Up</Text>
             </Link>
             <ErrorMessage msg={errorMsg}></ErrorMessage>
         </View>

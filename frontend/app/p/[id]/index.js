@@ -200,7 +200,7 @@ const Profile = () => {
 
             </ScrollView>
 
-            <Tabs handleHome={() => {setFresh(false); router.push('/home')}} handleProfile={() => {ownProfile ? scrollToTop : router.push(`/p/${user}`)}} />
+            <Tabs currentPage={ownProfile ? 2 : null } handleHome={() => {setFresh(false); router.push('/home')}} handleProfile={() => {ownProfile ? scrollToTop : router.push(`/p/${user}`)}} />
 
         </View>
     );

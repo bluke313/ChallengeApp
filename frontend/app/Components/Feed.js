@@ -30,11 +30,20 @@ const getUsername = async () => {
 };
 
 const FeedImage = ({ image }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
     console.log(image)
     return (
         <View style={styles.container}>
-            <Link style={{color: "white"}} href={`/p/${image.username}`}>{image.username}</Link>
-            <Pressable 
+            <Link
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                style={isHovered
+                    ? { color: 'white', textDecorationLine: 'underline' }
+                    : { color: "white" }}
+                href={`/p/${image.username}`}
+            >{image.username}</Link>
+            <Pressable
                 onPress={() => router.push(`i/${image.id}`)}
                 key={`${image.id}-image`}
             >
@@ -79,12 +88,12 @@ export const Feed = ({ user }) => {
 
     return (
         <View>
-            {feedData == null ? null : feedData.map( (data, i) =>  <FeedImage key={i} image={data} />)}
+            {feedData == null ? null : feedData.map((data, i) => <FeedImage key={i} image={data} />)}
         </View>
     )
 };
 
-export const UserFeed = ({onClose, user, searchText }) => {
+export const UserFeed = ({ onClose, user, searchText }) => {
 
     const [feedData, setFeedData] = useState(null);
 
@@ -100,7 +109,7 @@ export const UserFeed = ({onClose, user, searchText }) => {
                         'content-Type': 'application/json',
                         authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({query: searchText})
+                    body: JSON.stringify({ query: searchText })
                 }
             );
             const responseJson = await response.json();
@@ -123,9 +132,9 @@ export const UserFeed = ({onClose, user, searchText }) => {
     })
 
     return (
-        
+
         <View style={styles.container}>
-            {feedData == null ? null : (feedData.length == 0 ? <Text style={{opacity: '50%', color: colors.accent}}>No Results Found</Text> : feedData.map( (data, i) =>  <UsernameLink onClose={onClose} key={i} data={data}/>))}
+            {feedData == null ? null : (feedData.length == 0 ? <Text style={{ opacity: '50%', color: colors.accent }}>No Results Found</Text> : feedData.map((data, i) => <UsernameLink onClose={onClose} key={i} data={data} />))}
         </View>
     )
 };
@@ -135,19 +144,19 @@ const UsernameLink = ({ onClose, data, ...rest }) => {
     const [friendStatus, setFriendStatus] = useState(data.type)
 
     const SocialButton = () => {
-        if(friendStatus == -1){
+        if (friendStatus == -1) {
             return (
-                <Pressable onPress={() => sendAssociationRequest(0, friendStatus, data.username, setFriendStatus)} style={styles.plusView}><Icon name='account-plus' type='material-community' color={"gray"}/></Pressable>
+                <Pressable onPress={() => sendAssociationRequest(0, friendStatus, data.username, setFriendStatus)} style={styles.plusView}><Icon name='account-plus' type='material-community' color={"gray"} /></Pressable>
             )
         }
-        else if(friendStatus == 0) {
+        else if (friendStatus == 0) {
             return (
-                <Pressable onPress={() => sendAssociationRequest(-1, friendStatus, data.username, setFriendStatus)} style={styles.plusView}><Icon name='account-clock' type='material-community' color={"orange"}/></Pressable>
+                <Pressable onPress={() => sendAssociationRequest(-1, friendStatus, data.username, setFriendStatus)} style={styles.plusView}><Icon name='account-clock' type='material-community' color={"orange"} /></Pressable>
             )
         }
         else {
             return (
-                <View style={styles.plusView}><Icon name='account-heart' type='material-community' color={colors.accent}/></View>
+                <View style={styles.plusView}><Icon name='account-heart' type='material-community' color={colors.accent} /></View>
             )
         }
     }
@@ -188,7 +197,7 @@ const UsernameLink = ({ onClose, data, ...rest }) => {
     })
 
     return (
-        <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => {onClose(); router.push(`/p/${data.username}`);}}>
+        <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => { onClose(); router.push(`/p/${data.username}`); }}>
             <Text style={styles.text}>{data.username}</Text>
             <SocialButton friendStatus={data.type} />
         </Pressable>

@@ -66,7 +66,7 @@ const home = () => {
                 <Feed user={username} />
             </ScrollView>
 
-            <Tabs handleHome={scrollToTop} handleProfile={() => router.push(`/p/${username}`)}/>
+            <Tabs currentPage={0} handleHome={scrollToTop} handleProfile={() => router.push(`/p/${username}`)}/>
 
         </View>
     );

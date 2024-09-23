@@ -3,12 +3,18 @@ import { StyleSheet, TextInput, Text, View, Pressable } from "react-native";
 import { colors } from "../../assets/theme";
 
 export const StyledTextInput = ({...rest}, ref) => {
-    const [focused, setFocused] = useState(false)
+    const [focused, setFocused] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
     return (
         <TextInput
+            onPointerEnter={() => setIsHovered(true)}
+            onPointerLeave={() => setIsHovered(false)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            style={focused ? styles.inputFocused : styles.input} 
+            style={focused 
+                ? styles.inputFocused 
+                : (isHovered ? styles.hoveredInput : styles.input)} 
             ref={ref}
             {...rest} 
         />
@@ -40,6 +46,16 @@ const styles = StyleSheet.create({
     input: {
         height: 40,
         borderColor: colors.gray,
+        borderWidth: 1,
+        marginBottom: 12,
+        paddingHorizontal: 8,
+        width: 220,
+        alignSelf: 'center',
+        color: colors.text,
+    },
+    hoveredInput: {
+        height: 40,
+        borderColor: 'white',
         borderWidth: 1,
         marginBottom: 12,
         paddingHorizontal: 8,

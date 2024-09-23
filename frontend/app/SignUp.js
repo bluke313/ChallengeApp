@@ -2,7 +2,7 @@ import React, { useState, useEffect, component } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
-import {storeSecret} from './Storage.js';
+import { storeSecret } from './Storage.js';
 import { Button } from '@components/Button.js';
 import { PrimaryButton } from './Components/Button';
 import { SecureTextinput, StyledTextInput } from './Components/Input.js';
@@ -15,6 +15,7 @@ const SignUp = (props) => {
     const [password, setPassword] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
     const [allowSignUp, setAllowSignUp] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -57,7 +58,7 @@ const SignUp = (props) => {
         }
         else {
             setAllowSignUp(false);
-        }        
+        }
     };
 
     const handleKeyPress = (e) => {
@@ -90,7 +91,7 @@ const SignUp = (props) => {
                 onKeyPress={handleKeyPress}
 
             />
-            <SecureTextinput 
+            <SecureTextinput
                 placeholder="Password"
                 value={password}
                 onChangeText={setPassword}
@@ -98,7 +99,10 @@ const SignUp = (props) => {
             />
             <Button onPress={handleLogin} text='Sign Up' disabled={!allowSignUp} />
             <Link style={styles.link} href='/Login'>
-                <Text style={styles.linkText}>I already have an account</Text>
+                <Text
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                    style={isHovered ? {color: '#8bdbb3', textDecorationLine: 'underline'} : styles.linkText}>I already have an account</Text>
             </Link>
             <ErrorMessage msg={errorMsg}></ErrorMessage>
         </View>
