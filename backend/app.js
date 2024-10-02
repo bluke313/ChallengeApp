@@ -33,18 +33,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage }).single('file') //Tbh idk what this does
 
+//TODO consider deletion
 function imageToBytes(filePath) {
     const data = fs.readFileSync(filePath).toString('binary')
     // console.log(data)
 }
 
+//TODO consider deletion
 function savePhoto(data, userId, uploadDate) {
     db.run(`INSERT INTO Images (image, timestamp, userId) VALUES ('${data}', '${uploadDate}', ${userId})`);
 }
-
-// savePhoto("asdfeff", 16, 'fhasdfk')
-
-// imageToBytes('../frontend/assets/example-user-icon.jpg')
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
@@ -55,7 +53,7 @@ function authenticateToken(req, res, next) {
     jwt.verify(token, "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi", (err, userId) => {
         // console.log(`Authenticate token ERROR: ${err}`);
 
-        if (err) return res.sendStatus(403)
+        if (err) return res.status(403).send({"message": "You do not have permission to view this page."})
 
         req.body.userId = userId;
 

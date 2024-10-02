@@ -78,13 +78,16 @@ export const Feed = ({ user }) => {
                 }
             );
             const responseJson = await response.json();
-            setFeedData(responseJson);
+            
+            if(response.status === 200){
+                setFeedData(responseJson);
+            }
         } catch (err) {
             console.error(err);
         }
     }
 
-    useEffect(() => { fetchFeed() }, []);
+    useEffect(() => {fetchFeed()}, []);
 
     return (
         <View>

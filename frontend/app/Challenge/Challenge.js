@@ -32,8 +32,10 @@ export const ChallengesView = ({user, fresh}) => {
                     }
                 );
                 const responseJson = await response.json();
-                console.log(responseJson)
-                setChallenges(responseJson.images)
+                
+                if(response.status === 200){
+                    setChallenges(responseJson.images)
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -43,7 +45,7 @@ export const ChallengesView = ({user, fresh}) => {
     }, [fresh])
     return (
         <View style={styles.challengeViewStyle}>
-            {challenges.map((item, i) => 
+            {challenges === [] ? null : challenges.map((item, i) => 
                 <Pressable 
                 style={{ borderColor: '#38c880', borderWidth: 1}}
                 onPress={() => router.push(`i/${item.id}`)}

@@ -9,6 +9,7 @@ import Search from './Search.js';
 const home = () => {
     const [username, setUsername] = useState('');
     const [modalShown, setModalShown] = useState(false);
+
     const scrollViewRef = useRef(null);
 
     // Reset user view to top of screen
@@ -37,8 +38,15 @@ const home = () => {
                     }
                 );
                 const responseJson = await response.json();
-                console.log(responseJson)
-                setUsername(responseJson.username)
+                
+                if(response.status == 200){
+                    setUsername(responseJson.username)
+                }
+                else {
+                    console.log('pushing')
+                    router.push('/Login')
+                }
+                
             } catch (err) {
                 console.error(err);
             }

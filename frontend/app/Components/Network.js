@@ -1,4 +1,5 @@
 import { dropSecret, retrieveSecret } from '../Storage.js';
+import { router } from 'expo-router';
 
 
 export const whoAmI = async (setState) => {
@@ -16,7 +17,14 @@ export const whoAmI = async (setState) => {
             }
         );
         const responseJson = await response.json();
-        setState(responseJson.username)
+        
+        if(response.status === 200){
+            setState(responseJson.username)
+        }
+        else {
+            router.push('/Login')
+        }
+
     } catch (error) {
         console.error(error);
     }

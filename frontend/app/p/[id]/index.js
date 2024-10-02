@@ -61,14 +61,19 @@ const Profile = () => {
                     }
                 );
                 const responseJson = await response.json();
-                console.log(responseJson)
-                setUser(responseJson.username)
-                setBio(responseJson.bio)
-                setOwnProfile(responseJson.ownProfile)
-                setFriendCount(responseJson.friendCount)
-                if(!responseJson.ownProfile){
-                    console.log("setting friend status to: " + responseJson.friends)
-                    setFriendStatus(responseJson.friends)
+                
+                if(response.status == 200){
+                    setUser(responseJson.username)
+                    setBio(responseJson.bio)
+                    setOwnProfile(responseJson.ownProfile)
+                    setFriendCount(responseJson.friendCount)
+                    if(!responseJson.ownProfile){
+                        console.log("setting friend status to: " + responseJson.friends)
+                        setFriendStatus(responseJson.friends)
+                    }
+                }
+                else {
+                    router.push('/Login')
                 }
                 // setChallenges(responseJson.images)
             } catch (error) {

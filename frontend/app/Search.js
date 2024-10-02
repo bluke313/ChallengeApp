@@ -1,11 +1,12 @@
 import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
-import { router } from 'expo-router';
 import { useState, useEffect, useRef } from 'react';
 import { Button, Tabs } from '@components/Button.js';
 import { StyledTextInput } from '@components/Input.js';
 import { UserFeed } from '@components/Feed.js';
 import { whoAmI } from './Components/Network.js';
 import { PrimaryButton } from './Components/Button.js';
+import { router } from 'expo-router';
+
 
 const Search = ({onClose}) => {
 
