@@ -45,6 +45,12 @@ const RootLayout = () => {
                     headerShown: false,
                 }}
             />
+            <Stack.Screen
+                name="Camera"
+                options={{
+                    headerShown: false,
+                }}
+            />
         </Stack>
     )
 };

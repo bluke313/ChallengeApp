@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import { colors } from "../../assets/theme";
 import { useState, useEffect } from 'react';
+import { router } from 'expo-router';
 // import userIcon from '/'
 
 export default function IndicatorButton({ children }) {
@@ -116,7 +117,7 @@ export const Tabs = ({ handleHome, handleProfile, currentPage }) => {
         style={currentPage == 1
           ? styles.hoveredTabsButton
           : (isHoveredPic ? styles.hoveredTabsButton : styles.tabsButton) }
-        onPress={null}>
+        onPress={() => router.push('/Camera')}>
         <Text style={styles.buttonText}>{"camera"}</Text>
       </Pressable>
 
