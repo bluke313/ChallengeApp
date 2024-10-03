@@ -44,6 +44,27 @@ export async function retrieveSecret(key){
     }
 }
 
+export async function hasSecret(key){
+    if(Platform.OS == 'web'){
+        try {
+            const token = localStorage.getItem(key)
+            return token !== null
+        }
+        catch (e){
+            console.log(e)
+            return false
+        }
+    }
+    try {
+        const token = await SecureStore.getItemAsync(key)
+        return token !== null
+    }
+    catch (e){
+        console.log(e)
+        return false
+    }
+}
+
 export async function dropSecret(key){
     if(Platform.OS == 'web'){
         try {

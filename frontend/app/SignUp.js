@@ -1,8 +1,8 @@
 import React, { useState, useEffect, component } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
-import { Link, router } from 'expo-router';
+import { Link, useRootNavigationState, router } from 'expo-router';
 import ErrorMessage from '../ErrorMessage';
-import { storeSecret } from './Storage.js';
+import { hasSecret, storeSecret } from './Storage.js';
 import { Button } from '@components/Button.js';
 import { PrimaryButton } from './Components/Button';
 import { SecureTextinput, StyledTextInput } from './Components/Input.js';
@@ -16,6 +16,9 @@ const SignUp = (props) => {
     const [errorMsg, setErrorMsg] = useState('');
     const [allowSignUp, setAllowSignUp] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+
+    const navigationState = useRootNavigationState();
+
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -69,6 +72,21 @@ const SignUp = (props) => {
             }
         }
     };
+
+    useEffect(() => {
+        const checkTokenExists = async () => {
+            const resp = await hasSecret('authToken')
+            
+            if(resp){
+                router.push('/home')
+            }
+        }
+
+        if(navigationState?.key){
+            checkTokenExists()
+        }
+
+    }, [navigationState?.key]);
 
     useEffect(() => {
         validifyLogin();

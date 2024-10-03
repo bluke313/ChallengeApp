@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
-import { router, Link } from 'expo-router';
+import { router, useRootNavigationState, Link } from 'expo-router';
 import ErrorMessage from '../ErrorMessage.js';
-import { storeSecret } from './Storage.js'
+import { hasSecret, storeSecret } from './Storage.js'
 import { Button } from '@components/Button.js';
 import { PrimaryButton } from './Components/Button.js';
 import { SecureTextinput, StyledTextInput } from '@components/Input.js';
@@ -14,6 +14,8 @@ const Login = (props) => {
     const [errorMsg, setErrorMsg] = useState('');
     const [allowLogin, setAllowLogin] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
+
+    const navigationState = useRootNavigationState();
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -74,6 +76,22 @@ const Login = (props) => {
         }
     };
 
+    //token check useEffect
+    useEffect(() => {
+        const checkTokenExists = async () => {
+            const resp = await hasSecret('authToken')
+            if(resp){
+                router.push('/home')
+            }
+        }
+
+        if(navigationState?.key){
+            checkTokenExists()
+        }
+
+    }, [navigationState?.key]);
+
+    //password verification useEffect
     useEffect(() => {
         validifyLogin();
     }, [email, password]);
