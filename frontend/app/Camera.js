@@ -8,6 +8,7 @@ import { whoAmI } from './Components/Network';
 
 export default function Camera() {
   const [facing, setFacing] = useState('back');
+  const [mirror, setMirror] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
   const [username, setUsername] = useState('');
 
@@ -36,8 +37,12 @@ export default function Camera() {
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
+      <CameraView style={styles.camera} facing={facing} zoom={1}>
         <View style={styles.buttonContainer}>
+
+          {/* <TouchableOpacity style={styles.button} onPress={() => {console.log(mirror); setMirror(!mirror)}}>
+            <Text style={styles.text}>Mirror</Text>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
             <Text style={styles.text}>Flip Camera</Text>
           </TouchableOpacity>
@@ -53,6 +58,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
+    position: 'relative'
 
   },
   message: {
