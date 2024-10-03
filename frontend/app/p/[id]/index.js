@@ -73,6 +73,7 @@ const Profile = () => {
                     }
                 }
                 else {
+                    dropSecret('authToken')
                     router.push('/Login')
                 }
                 // setChallenges(responseJson.images)

@@ -44,6 +44,7 @@ const home = () => {
                 }
                 else {
                     console.log('pushing')
+                    dropSecret('authToken')
                     router.push('/Login')
                 }
                 
