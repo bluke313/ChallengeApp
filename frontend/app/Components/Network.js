@@ -22,6 +22,7 @@ export const whoAmI = async (setState) => {
             setState(responseJson.username)
         }
         else {
+            dropSecret('authToken')
             router.push('/Login')
         }
 

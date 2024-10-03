@@ -1,7 +1,7 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState, useEffect } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Tabs } from './Components/Button';
+import { useState, useRef, useEffect } from 'react';
+import { Pressable, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { Tabs, Button } from './Components/Button';
 import { router } from 'expo-router';
 import { whoAmI } from './Components/Network';
 
@@ -11,6 +11,9 @@ export default function Camera() {
   const [mirror, setMirror] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
   const [username, setUsername] = useState('');
+
+  const cameraRef = useRef(null);
+  const [imageUri, setImageUri] = useState(null);
 
   useEffect(() => {
     whoAmI(setUsername)
@@ -31,23 +34,59 @@ export default function Camera() {
     );
   }
 
+  const takePicture = async () => {
+    if(cameraRef.current) {
+        try {
+            const photo = await cameraRef.current.takePictureAsync({
+                quality: 1,
+                mirror: true
+            })
+            handlePictureSaved(photo);
+        } catch (e) {
+            console.error(e)
+        }
+    }
+  }
+
+  const handlePictureSaved = (photo) => {
+    setImageUri(photo.uri)
+  }
+
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
 
+  const cameraState = () => {
+    if(imageUri) {
+        return (
+            <View style={styles.imageContainer}>
+                <Image source={{ uri: imageUri }} style={styles.image} />
+                <View style={{display: "flex", flexDirection: "row"}}>
+                    <Button style={{flexGrow: 1}} text="Confirm" />
+                    <Button style={{flexGrow: 1}} text="Retake" onPress={() => setImageUri(null)} />
+                </View>
+            </View>
+        )
+    }
+    else {
+        return (
+        <CameraView mirror={false} ref={cameraRef} style={styles.camera} facing={facing} zoom={1}>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={takePicture}>
+                    <Text style={styles.text}>Click</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+                    <Text style={styles.text}>Flip Camera</Text>
+                </TouchableOpacity>
+            </View>
+        </CameraView>
+      )
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} zoom={1}>
-        <View style={styles.buttonContainer}>
-
-          {/* <TouchableOpacity style={styles.button} onPress={() => {console.log(mirror); setMirror(!mirror)}}>
-            <Text style={styles.text}>Mirror</Text>
-          </TouchableOpacity> */}
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
-        </View>
-      </CameraView>
+      {cameraState()}
       <Tabs currentPage={0} handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/>
     </View>
   );
@@ -59,7 +98,6 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     position: 'relative'
-
   },
   message: {
     textAlign: 'center',
@@ -85,4 +123,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  imageContainer: {
+    display: "flex",
+    flexDirection: "column",
+
+  },
+  image: {
+    width: 350,
+    height: 600,
+    marginTop: 10,
+  }
+
 });
