@@ -17,6 +17,63 @@ const port = 3000
 // Set up db
 const db = new sqlite3.Database('./database.db')
 
+//check if there are any active challenges
+async function getActiveChallenge(){
+    return new Promise((resolve, reject) => {
+        db.get('SELECT * FROM Challenges WHERE active = 0;', async (err, row) => {
+            if(err){
+                console.log("ERROR: isActiveChallenge", err)
+                reject(err)
+            }
+            else {
+                if(row == undefined){
+                    resolve(null)
+                }
+                resolve(row)
+            }
+        })
+    }
+    )
+}
+
+async function main(){
+    let activeChallenge = await getActiveChallenge()
+
+    //zero out active challenge
+    db.run(`UPDATE Challenges SET active = 0;`, async(err) => {
+        //select new challenge for today
+    db.all('SELECT id FROM Challenges where picked = 0;', async (err, row) => {
+        if(err){
+            console.log("ERROR: Selecting unpicked challenges", err)
+        }
+        else {
+            console.log(row)
+            if(row.length == 0){
+                db.run(`UPDATE Challenges SET picked = 0;`)
+                db.all('SELECT id FROM Challenges where picked = 0;', async (err, row) => {
+                    if(err){
+                        console.log("ERROR: Selecting unpicked challenges", err)
+                    }
+                    else{
+                        return row[Math.floor(Math.random() * row.length)]
+                    }
+                })
+            }
+            else{
+                console.log("2")
+                return row[Math.floor(Math.random() * row.length)]
+            }
+            }
+        })
+    })
+
+    
+}
+
+console.log(main())
+// if not activate one
+
+
 const router = express.Router()
 
 app.use('/', router)
@@ -281,6 +338,17 @@ function getDateTimeForDB() {
     return `${year}-${month}-${day} ${hour}:${min}:${second}`
 }
 
+function getDateTimeForChallenge() {
+    const date = new Date()
+    const day = ("0" + date.getDate()).slice(-2)
+    const month = ("0" + date.getMonth() + 1).slice(-2)
+    const year = date.getFullYear()
+    const hour = date.getHours()
+    const min = date.getMinutes()
+    const second = date.getSeconds()
+    return `${year}-${month}-${day} 00:00:00`
+}
+
 router.route('/upload').post(async (req, res) => {
     upload(req, res, (err) => { //initiates the storage function for the photo
         if (err) {
@@ -461,6 +529,22 @@ router.route('/associationRequest').post(authenticateToken, async (req, res) => 
 
 router.route('/whoami').get(authenticateToken, async (req, res) => {
     res.status(200).send({ "username": req.body.userId.userId })
+})
+
+//SELECT * FROM Challenges WHERE start = '2024-10-4 00:00:00';
+router.route('/challenge').get(authenticateToken, async (req, res) => {
+    db.get(`
+            SELECT * FROM Challenges WHERE start = '${getDateTimeForChallenge()}';
+        `, async (err, row) => {
+            if (err) {
+                console.log(`/associationRequest ERROR: ${err}`);
+                res.status(500).send({ 'message': 'Database error!', 'success': false });
+            }
+            else{
+                res.status(200).send(row)
+            }
+        }
+    )
 })
 
 app.use(express.static('public'));

@@ -62,12 +62,37 @@ const FeedImage = ({ image }) => {
 
 export const Feed = ({ user }) => {
     const [feedData, setFeedData] = useState(null);
+    const [currentChallenge, setCurrentChallenge] = useState(null)
 
     const fetchFeed = async () => {
         try {
             const token = await retrieveSecret('authToken');
             const response = await fetch(
                 'http://localhost:3000/feed',
+                {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'content-Type': 'application/json',
+                        authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            const responseJson = await response.json();
+            
+            if(response.status === 200){
+                setFeedData(responseJson);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+    
+    const fetchCurrentChallenge = async () => {
+        try {
+            const token = await retrieveSecret('authToken');
+            const response = await fetch(
+                'http://localhost:3000/challenge',
                 {
                     method: 'GET',
                     headers: {
