@@ -49,6 +49,7 @@ export default function Camera() {
   }
 
   const handlePictureSaved = (photo) => {
+    console.log(photo)
     setImageUri(photo.uri)
   }
 

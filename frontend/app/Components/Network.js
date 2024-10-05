@@ -1,5 +1,6 @@
 import { dropSecret, retrieveSecret } from '../Storage.js';
 import { router } from 'expo-router';
+import axios from 'axios'
 
 
 export const whoAmI = async (setState) => {
@@ -60,3 +61,20 @@ export const sendAssociationRequest = async (newCode, currentCode, targetUsernam
         console.error(error);
     }
 }
+
+export const photoUpload = async (photo) => {
+    const data = new FormData() //creates binary to transfer photo
+    data.append('file', photo) //adds photo to the binary
+    data.append('body', JSON.stringify({
+      "caption": "Hey this is my photo",
+      // "token": `${retrieveSecret('authToken')}`,
+      "username": username
+    }))
+
+    axios.post('http://localhost:3000/upload', data) //sends photo the backend
+      .then((res) => {
+        console.log(res)
+      })
+
+    fresh()
+  };

@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Pressable, Image } from "react-native";
 import { colors } from "../../assets/theme";
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
+import { retrieveSecret } from "../Storage";
 // import userIcon from '/'
 
 export default function IndicatorButton({ children }) {
@@ -41,6 +42,35 @@ export const Tabs = ({ handleHome, handleProfile, currentPage }) => {
   const [isHoveredHome, setIsHoveredHome] = useState(false);
   const [isHoveredPic, setIsHoveredPic] = useState(false);
   const [isHoveredProfile, setIsHoveredProfile] = useState(false);
+
+  const handleChallengePress = async () => {
+      try {
+          const token = await retrieveSecret('authToken')
+          console.log(`Token: ${token}`)
+          const response = await fetch(
+              'http://localhost:3000/newChallenge',
+              {
+                  method: 'GET',
+                  headers: {
+                      Accept: 'application/json',
+                      'Content-Type': 'application/json',
+                      authorization: `Bearer ${token}`
+                  },
+              }
+          );
+          const responseJson = await response.json();
+          
+          if(response.status == 200){
+              console.log("new challenge selected")
+          }
+          else {
+              console.log('new challenge failed')
+          }
+          
+      } catch (err) {
+          console.error(err);
+      }
+  }
 
   const styles = StyleSheet.create({
     buttonStyle: {
@@ -129,6 +159,11 @@ export const Tabs = ({ handleHome, handleProfile, currentPage }) => {
           : (isHoveredProfile ? styles.hoveredTabsButton : styles.tabsButton) }
         onPress={handleProfile}>
         <Text style={styles.buttonText}>{`\u{1F9D1}`}</Text>
+      </Pressable>
+      <Pressable
+        style={styles.tabsButton}
+        onPress={handleChallengePress}>
+        <Text style={styles.buttonText}>{`C`}</Text>
       </Pressable>
     </View>
   )

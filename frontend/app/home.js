@@ -9,6 +9,7 @@ import Search from './Search.js';
 const home = () => {
     const [username, setUsername] = useState('');
     const [modalShown, setModalShown] = useState(false);
+    const [activeChallenge, setActiveChallenge] = useState(null);
 
     const scrollViewRef = useRef(null);
 
@@ -22,6 +23,34 @@ const home = () => {
     useEffect(() => {
         // setUsername('test');
 
+        const fetchChallenge = async () => {
+            try {
+                const token = await retrieveSecret('authToken')
+                console.log(`Token: ${token}`)
+                const response = await fetch(
+                    'http://localhost:3000/challenge',
+                    {
+                        method: 'GET',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                            authorization: `Bearer ${token}`
+                        },
+                    }
+                );
+                const responseJson = await response.json();
+                
+                if(response.status == 200){
+                    setActiveChallenge(responseJson)
+                }
+                else {
+                    console.log('error fetching challenge')
+                }
+                
+            } catch (err) {
+                console.error(err);
+            }
+        }
         const fetchHome = async () => {
             try {
                 const token = await retrieveSecret('authToken')
@@ -53,6 +82,7 @@ const home = () => {
             }
         }
         fetchHome()
+        fetchChallenge()
 
     }, []);
 
@@ -61,6 +91,7 @@ const home = () => {
 
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <Text style={styles.title}>Home Page</Text>
+                <Text style={styles.title}>{activeChallenge?.name}</Text>
                 <Button onPress={() => setModalShown(true)} text='Search'/>
                 <Modal
                             animationType="slide"
