@@ -75,7 +75,7 @@ export default function Camera() {
     else {
         return (
         <CameraView mirror={false} ref={cameraRef} style={styles.camera} facing={facing} zoom={1}>
-                <Text style={styles.text}>Hello buddy</Text>
+                <Text style={styles.text}>{activeChallenge?.name}</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={takePicture}>
                     <Text style={styles.text}>Click</Text>
