@@ -206,14 +206,17 @@ router.route('/login').post(async (req, res) => {
 })
 
 router.route('/profile').post(authenticateToken, async (req, res) => {
+
+    const pageUserName = req.body.pageUserName ? req.body.pageUserName : req.body.userId.userId;
+
     db.all(`
         SELECT Images.path, Images.timestamp, Images.caption, Images.id FROM Images 
         inner join Users 
         on Users.id = Images.userId 
-        where Users.username = '${req.body.pageUserName}'
+        where Users.username = '${pageUserName}'
         order by Images.timestamp;
         `, async (err, row) => {
-        const ownProfile = req.body.pageUserName === req.body.userId.userId
+        const ownProfile = pageUserName === req.body.userId.userId
         if (err) {
             console.log(`/profile ERROR: ${err}`);
             res.status(500).send({ "message": "Database error!", "success": false })
@@ -221,7 +224,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
         }
         const imagePaths = formateImagePathsFromDBRows(row)
 
-        db.get(`select bio from Users where username = '${req.body.pageUserName}';`, async (err, row) => {
+        db.get(`SELECT bio FROM Users WHERE username = '${pageUserName}';`, async (err, row) => {
             if (err) {
                 console.log(`/profile ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false })
@@ -229,7 +232,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
             }
             else { // get amount of friends
                 const bioRow = row
-                db.get(`SELECT COUNT(*) as friendCount FROM Associations WHERE userId = (SELECT id from Users where username = '${req.body.pageUserName}') and type = 1;`,
+                db.get(`SELECT COUNT(*) as friendCount FROM Associations WHERE userId = (SELECT id from Users where username = '${pageUserName}') and type = 1;`,
                     async (err, row) => {
                         if (err) {
                             console.log(`/profile ERROR: ${err}`);
@@ -249,7 +252,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                                     INNER JOIN Users
                                     ON Users.id = Associations.userId
                                     WHERE Users.username = '${req.body.userId.userId}'
-                                    AND Associations.targetUserId = (SELECT id FROM Users WHERE username = '${req.body.pageUserName}');
+                                    AND Associations.targetUserId = (SELECT id FROM Users WHERE username = '${pageUserName}');
                                 `, async (err, row) => {
                                 if (err) {
                                     console.log(`/profile ERROR: ${err}`);
@@ -260,7 +263,6 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                                 if (row !== undefined) {
                                     friends = row.type
                                 }
-                                console.log("this is bio")
                                 console.log(bioRow)
                                 res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friends": friends, "friendCount": friendCountRow.friendCount })
 
@@ -572,7 +574,12 @@ router.route('/newChallenge').get(authenticateToken, async (req, res) => {
             }
         })
     })
-})
+});
+
+router.route('/updateProfile').post(authenticateToken, async (req, res) => {
+    db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
+    res.status(200).send({  })
+});
 
 app.use(express.static('public'));
 

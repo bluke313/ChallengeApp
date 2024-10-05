@@ -5,11 +5,10 @@ import { shouldUseActivityState } from 'react-native-screens';
 
 
 import IndicatorButton from '@components/Button.js';
-import UserIcon from '@components/Icons.js';
 import TabSelect, { TabArea } from '@components/Tabs.js';
 import PhotoUpload from '@components/PhotoUpload.js';
 import { retrieveSecret } from '../../Storage.js'
-import { ChallengesView } from '../../Challenge/Challenge.js'
+import { ProfileFeed } from '@components/Feed.js'
 import { Button, Tabs } from '@components/Button.js';
 import { StyledTextInput } from '@components/Input.js'
 import { sendAssociationRequest } from '@components/Network.js'
@@ -21,15 +20,14 @@ function GroupModal() {
 }
 
 const Profile = () => {
-    const [active, setActive] = useState(0)
-    const [friendCount, setFriendCount] = useState(0)
-    const [user, setUser] = useState(null)
-    const [bio, setBio] = useState("")
-    const [fresh, setFresh] = useState(true)
-    const [ownProfile, setOwnProfile] = useState(false)
-    const [modalShown, setModalShown] = useState(false)
-    const [friendStatus, setFriendStatus] = useState(-2) //-2 default (own profile or not loaded) -1 not friends 0 pending 1 friend 2 blocked
-    const bioRef = useRef(null)
+    const [active, setActive] = useState(0);
+    const [friendCount, setFriendCount] = useState(0);
+    const [user, setUser] = useState(null);
+    const [bio, setBio] = useState("");
+    const [fresh, setFresh] = useState(true);
+    const [ownProfile, setOwnProfile] = useState(false);
+    const [modalShown, setModalShown] = useState(false);
+    const [friendStatus, setFriendStatus] = useState(-2); //-2 default (own profile or not loaded) -1 not friends 0 pending 1 friend 2 blocked
     const scrollViewRef = useRef(null);
 
     const glob = useGlobalSearchParams();
@@ -37,7 +35,7 @@ const Profile = () => {
     // Reset user view to top of screen
     const scrollToTop = () => {
         if (scrollViewRef.current) {
-            scrollViewRef.current.scrollTo({ y: 0, animated: true});
+            scrollViewRef.current.scrollTo({ y: 0, animated: true });
         }
     };
 
@@ -61,13 +59,13 @@ const Profile = () => {
                     }
                 );
                 const responseJson = await response.json();
-                
-                if(response.status == 200){
-                    setUser(responseJson.username)
-                    setBio(responseJson.bio)
-                    setOwnProfile(responseJson.ownProfile)
-                    setFriendCount(responseJson.friendCount)
-                    if(!responseJson.ownProfile){
+
+                if (response.status == 200) {
+                    setUser(responseJson.username);
+                    setOwnProfile(responseJson.ownProfile);
+                    setFriendCount(responseJson.friendCount);
+                    setBio(responseJson.bio);
+                    if (!responseJson.ownProfile) {
                         console.log("setting friend status to: " + responseJson.friends)
                         setFriendStatus(responseJson.friends)
                     }
@@ -86,57 +84,11 @@ const Profile = () => {
 
     //Liam | UX/UI Designer 🎨 | Turning ideas into seamless experiences ✨ | Coffee addict ☕ | Always sketching the next big thing 🚀
 
-
-    const AddBio = () => {
-        const [text, setText] = useState("")
-
-        return (
-            <View style={styles.addBioView}>
-                <StyledTextInput
-                    placeholder="Add a nifty bio!"
-                    value={text}
-                    onChangeText={setText}
-                    // ref={bioRef}
-                />
-                <Pressable onPress={() => {
-                    const saveBio = async () => {
-                        try {
-                            const token = await retrieveSecret('authToken')
-                            console.log(`Token: ${token}`)
-                            const response = await fetch(
-                                'http://localhost:3000/savebio',
-                                {
-                                    method: 'POST',
-                                    headers: {
-                                        Accept: 'application/json',
-                                        'Content-Type': 'application/json',
-                                        authorization: `Bearer ${token}`
-                                    },
-                                    body: JSON.stringify({
-                                        "bio": text
-                                    }),
-                                }
-                            );
-                            const responseJson = await response.json();
-                            console.log(responseJson)
-                            setBio(bioRef.current.value)
-                        } catch (error) {
-                            console.error(error);
-                        }
-                    }
-                    saveBio()
-                }} style={styles.addBioButton}>
-                    <Text style={{ color: "white" }}>Add</Text>
-                </Pressable>
-            </View>
-        )
-    }
-
     const ProfileData = () => {
-        if(!ownProfile){
+        if (!ownProfile) {
             return (
                 <View>
-                    <ChallengesView user={glob.id} fresh={fresh} />
+                    <ProfileFeed user={glob.id} fresh={fresh} />
                 </View>
             )
         }
@@ -145,7 +97,7 @@ const Profile = () => {
             <View>
                 <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
                 <TabArea active={active}>
-                    <ChallengesView user={user} fresh={fresh} />
+                    <ProfileFeed user={user} fresh={fresh} />
                     <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
                 </TabArea>
             </View>
@@ -153,22 +105,22 @@ const Profile = () => {
     }
 
     const SocialButton = () => {
-        if(friendStatus == -2){
+        if (friendStatus == -2) {
             return null
         }
-        if(friendStatus == -1){
+        if (friendStatus == -1) {
             return (
-                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(0, friendStatus, glob.id, setFriendStatus)} text='Add Friend' />
+                <Button style={{ flexGrow: 1 }} onPress={() => sendAssociationRequest(0, friendStatus, glob.id, setFriendStatus)} text='Add Friend' />
             )
         }
-        else if(friendStatus == 0) {
+        else if (friendStatus == 0) {
             return (
-                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(-1)} text='Cancel Friend Request' />
+                <Button style={{ flexGrow: 1 }} onPress={() => sendAssociationRequest(-1)} text='Cancel Friend Request' />
             )
         }
         else {
             return (
-                <Button style={{flexGrow: 1}} onPress={() => sendAssociationRequest(-1)} text='Remove Friend' />
+                <Button style={{ flexGrow: 1 }} onPress={() => sendAssociationRequest(-1)} text='Remove Friend' />
             )
         }
     }
@@ -177,18 +129,20 @@ const Profile = () => {
         <View style={styles.container}>
 
             <ScrollView ref={scrollViewRef} style={styles.content}>
-                
+
                 <View style={styles.topView}>
-                    <Text style={styles.title}>Profile page</Text>
-                    <UserIcon style={styles.userIcon} />
+                    <Text style={styles.username}>{glob.id}</Text>
+                    <Pressable style={styles.profileButton} onPress={ownProfile ? () => router.push('/Settings') : null}>
+                        <Image style={styles.userIcon} source={require("./example-user-icon.jpg")} />
+                    </Pressable>
                 </View>
 
+                <View style={styles.bio}><Text style={styles.bioText}>{bio}</Text></View>
+
                 <View style={styles.infoView}>
-                    <Text style={styles.header1}>{glob.id}</Text>
-                    {bio == "" && ownProfile ? <AddBio /> : bio == "" ? null : <Text style={styles.bio}>{bio}</Text>}
                     <View style={styles.socialButtonView}>
-                        <Button style={{flexGrow: 1}} text={`${friendCount} Group Mates`} onPress={() => setModalShown(!modalShown)} />
-                        <Modal
+                        <Button style={{ flexGrow: 1 }} text={`${friendCount} Group Mates`} onPress={() => setModalShown(!modalShown)} />
+                        {/* <Modal
                             animationType="slide"
                             transparent={false}
                             visible={modalShown}
@@ -197,16 +151,17 @@ const Profile = () => {
                         }}>
                             <GroupModal />
                             <Button text={"close modal"} onPress={() => setModalShown(false)}/>
-                        </Modal>
+                        </Modal> */}
                         <SocialButton />
                     </View>
                     <View style={styles.bufferStyle}></View>
-                    <ProfileData/>
+                    {/* <ProfileData/> */}
+                    <ProfileFeed user={glob.id} fresh={fresh} />
                 </View>
 
             </ScrollView>
 
-            <Tabs currentPage={ownProfile ? 2 : null } handleHome={() => {setFresh(false); router.push('/home')}} handleProfile={() => {ownProfile ? scrollToTop : router.push(`/p/${user}`)}} />
+            <Tabs currentPage={ownProfile ? 2 : null} handleHome={() => { setFresh(false); router.push('/home') }} handleProfile={() => { ownProfile ? scrollToTop : router.push(`/p/${user}`) }} />
 
         </View>
     );
@@ -224,32 +179,47 @@ const styles = StyleSheet.create({
         height: 12,
         widht: 1,
     },
-    header1: {
+    username: {
         fontSize: 24,
         fontWeight: "bold",
         marginBottom: 4,
         color: '#fff',
+        textAlign: 'center',
     },
     bio: {
-        fontSize: 15,
         marginBottom: 4,
-        marginTop: 4,
-        maxWidth: "75%",
+        marginTop: 10,
+        marginLeft: 20,
+        maxWidth: "70%",
+    },
+    bioText: {
         color: '#fff',
+        fontSize: 15,
     },
     topView: {
         backgroundColor: '#1f8a55',
         height: '10vh',
-        padding: 30
+        padding: 30,
+        position: 'relative',
+        zIndex: 1000,
     },
     infoView: {
         padding: 16,
     },
-    userIcon: {
+    profileButton: {
         position: "absolute",
         bottom: 0 - 44,
         right: 16, //NOTE 24 might be better
         backgroundColor: '#38c880',
+        display: "inline",
+        padding: 4,
+        borderRadius: 50,
+        borderColor: '#38c880',
+    },
+    userIcon: {
+        borderRadius: 50,
+        width: 86,
+        height: 86,
     },
     input: {
         height: 40,
@@ -259,16 +229,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         width: 220,
         alignSelf: 'center',
-    },
-    addBioView: {
-        display: "flex",
-        flexDirection: "row"
-    },
-    addBioButton: {
-        backgroundColor: "#007BFF",
-        padding: 8,
-        height: 40,
-        borderRadius: "0.375rem"
     },
     container: {
         flex: 1,

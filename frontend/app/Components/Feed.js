@@ -1,33 +1,10 @@
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
-import { Link, router } from 'expo-router';
+import { Link, router, useGlobalSearchParams } from 'expo-router';
 import { retrieveSecret } from '../Storage';
 import { colors } from '../../assets/theme';
 import { Icon } from 'react-native-elements';
-import { sendAssociationRequest } from '@components/Network.js'
-
-const getUsername = async () => {
-    try {
-        const token = await retrieveSecret('authToken')
-        console.log(`Token: ${token}`)
-        const response = await fetch(
-            'http://localhost:3000/home',
-            {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    authorization: `Bearer ${token}`
-                },
-            }
-        );
-        const responseJson = await response.json();
-        console.log(responseJson)
-        setUsername(responseJson.username)
-    } catch (err) {
-        console.error(err);
-    }
-};
+import { sendAssociationRequest, whoAmI } from '@components/Network.js'
 
 const FeedImage = ({ image }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -79,32 +56,8 @@ export const Feed = ({ user }) => {
                 }
             );
             const responseJson = await response.json();
-            
-            if(response.status === 200){
-                setFeedData(responseJson);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    }
-    
-    const fetchCurrentChallenge = async () => {
-        try {
-            const token = await retrieveSecret('authToken');
-            const response = await fetch(
-                'http://localhost:3000/challenge',
-                {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        'content-Type': 'application/json',
-                        authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            const responseJson = await response.json();
-            
-            if(response.status === 200){
+
+            if (response.status === 200) {
                 setFeedData(responseJson);
             }
         } catch (err) {
@@ -112,7 +65,7 @@ export const Feed = ({ user }) => {
         }
     }
 
-    useEffect(() => {fetchFeed()}, []);
+    useEffect(() => { fetchFeed() }, []);
 
     return (
         <View>
@@ -231,6 +184,86 @@ const UsernameLink = ({ onClose, data, ...rest }) => {
         </Pressable>
     )
 }
+
+export const ProfileFeed = ({ user, fresh }) => {
+    const [challenges, setChallenges] = useState([])
+    const [username, setUsername] = useState(null)
+    const localParams = useGlobalSearchParams()
+    // console.log(`params: ${localParams.id}`)
+
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const token = await retrieveSecret('authToken')
+                console.log(`Token: ${token}`)
+                const response = await fetch(
+                    'http://localhost:3000/profile',
+                    {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                            authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            "pageUserName": user
+                        }),
+                    }
+                );
+                const responseJson = await response.json();
+
+                if (response.status === 200) {
+                    setChallenges(responseJson.images)
+                    console.log(responseJson.images)
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        whoAmI(setUsername)
+        fetchProfile()
+    }, [fresh])
+
+    const styles = StyleSheet.create({
+        challengeFeed: {
+            marginTop: 8,
+            marginLeft: "auto",
+            marginRight: "auto",
+            // backgroundColor: "red",
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            rowGap: 10,
+            gap: 10,
+        },
+        smallChallengeImage: {
+            width: 100,
+            height: 100
+        }
+    });
+
+    return (
+        <View style={styles.challengeFeed}>
+            {challenges == [] ? null : challenges.map((item, i) =>
+                <Pressable
+                    style={{ borderColor: '#38c880', borderWidth: 1}}
+                    onPress={() => router.push(`i/${item.id}`)}
+                    key={`${user}-image-${i}`}
+                >
+                    <Image
+                        style={styles.smallChallengeImage}
+                        source={{
+                            uri: `http://localhost:3000/${item.path}`,
+                        }}
+                    ></Image>
+                </Pressable>
+            )}
+        </View>
+    )
+}
+
 
 
 const styles = StyleSheet.create({
