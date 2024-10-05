@@ -35,6 +35,7 @@ export const ChallengesView = ({user, fresh}) => {
                 
                 if(response.status === 200){
                     setChallenges(responseJson.images)
+                    console.log(responseJson.images)
                 }
             } catch (error) {
                 console.error(error);

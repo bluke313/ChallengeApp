@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Pressable, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import { Tabs, Button } from './Components/Button';
 import { router } from 'expo-router';
-import { photoUpload, savePhotoRequest, whoAmI } from './Components/Network';
+import { fetchChallenge, photoUpload, savePhotoRequest, whoAmI } from './Components/Network';
 
 
 export default function Camera() {
@@ -14,9 +14,11 @@ export default function Camera() {
 
   const cameraRef = useRef(null);
   const [photo, setPhoto] = useState(null);
+  const [activeChallenge, setActiveChallenge] = useState(null);
 
   useEffect(() => {
     whoAmI(setUsername)
+    fetchChallenge(setActiveChallenge)
 }, [])
 
   if (!permission) {
@@ -64,7 +66,7 @@ export default function Camera() {
             <View style={styles.imageContainer}>
                 <Image source={{ uri: photo.uri }} style={styles.image} />
                 <View style={{display: "flex", flexDirection: "row"}}>
-                    <Button style={{flexGrow: 1}} onPress={() => savePhotoRequest(photo.base64)} text="Confirm" />
+                    <Button style={{flexGrow: 1}} onPress={() => savePhotoRequest(photo.base64, activeChallenge.id)} text="Confirm" />
                     <Button style={{flexGrow: 1}} text="Retake" onPress={() => setPhoto(null)} />
                 </View>
             </View>
@@ -73,6 +75,7 @@ export default function Camera() {
     else {
         return (
         <CameraView mirror={false} ref={cameraRef} style={styles.camera} facing={facing} zoom={1}>
+                <Text style={styles.text}>Hello buddy</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={takePicture}>
                     <Text style={styles.text}>Click</Text>

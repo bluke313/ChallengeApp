@@ -329,10 +329,25 @@ router.route('/upload').post(async (req, res) => {
 })
 
 router.route('/savePhoto').post(authenticateToken, async (req, res) => {
-    console.log(req.body)
     const base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
-    fs.writeFile(`./public/${uuidv4()}.png`, base64Data, 'base64', (err) => {
+    const filePath = `public/${uuidv4()}.png`
+    fs.writeFile(filePath, base64Data, 'base64', (err) => {
         if(err) throw err
+        else{
+            const username = req.body.userId.userId
+            const caption = ""
+            const timestamp = getDateTimeForDB()
+
+            db.get(`SELECT id FROM Users WHERE username = '${username}'`, async (err, row) => {
+                if (err) {
+                    console.log(`/upload ERROR: ${err}`);
+                    res.status(500).send({ "message": "Database error!", "success": false })
+                    return
+                }
+                const userId = row.id
+                db.run(`INSERT INTO Images (path, timestamp, userId, caption, challengeId) VALUES ('${filePath}', '${timestamp}', ${userId}, '${caption}', ${req.body.challengeId})`)
+            })
+        }
     })
     res.status(200).send({})
 

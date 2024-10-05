@@ -62,7 +62,7 @@ export const sendAssociationRequest = async (newCode, currentCode, targetUsernam
     }
 }
 
-export const savePhotoRequest = async (base64) => {
+export const savePhotoRequest = async (base64, challengeId) => {
     try {
         const token = await retrieveSecret('authToken')
         console.log(`Token: ${token}`)
@@ -76,13 +76,43 @@ export const savePhotoRequest = async (base64) => {
                     authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    image: base64
+                    image: base64,
+                    challengeId: challengeId
                 }),
             }
         );
         const responseJson = await response.json();
     } catch (error) {
         console.error(error);
+    }
+}
+
+export const fetchChallenge = async (setState) => {
+    try {
+        const token = await retrieveSecret('authToken')
+        console.log(`Token: ${token}`)
+        const response = await fetch(
+            'http://localhost:3000/challenge',
+            {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                },
+            }
+        );
+        const responseJson = await response.json();
+        
+        if(response.status == 200){
+            setState(responseJson)
+        }
+        else {
+            console.log('error fetching challenge')
+        }
+        
+    } catch (err) {
+        console.error(err);
     }
 }
 
