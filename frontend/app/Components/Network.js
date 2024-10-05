@@ -62,13 +62,37 @@ export const sendAssociationRequest = async (newCode, currentCode, targetUsernam
     }
 }
 
+export const savePhotoRequest = async (base64) => {
+    try {
+        const token = await retrieveSecret('authToken')
+        console.log(`Token: ${token}`)
+        const response = await fetch(
+            'http://localhost:3000/savePhoto',
+            {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    image: base64
+                }),
+            }
+        );
+        const responseJson = await response.json();
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export const photoUpload = async (photo) => {
     const data = new FormData() //creates binary to transfer photo
     data.append('file', photo) //adds photo to the binary
     data.append('body', JSON.stringify({
       "caption": "Hey this is my photo",
       // "token": `${retrieveSecret('authToken')}`,
-      "username": username
+      "username": "mailman"
     }))
 
     axios.post('http://localhost:3000/upload', data) //sends photo the backend
@@ -76,5 +100,5 @@ export const photoUpload = async (photo) => {
         console.log(res)
       })
 
-    fresh()
+    // fresh()
   };

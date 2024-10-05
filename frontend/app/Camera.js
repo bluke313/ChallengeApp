@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Pressable, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import { Tabs, Button } from './Components/Button';
 import { router } from 'expo-router';
-import { whoAmI } from './Components/Network';
+import { photoUpload, savePhotoRequest, whoAmI } from './Components/Network';
 
 
 export default function Camera() {
@@ -13,7 +13,7 @@ export default function Camera() {
   const [username, setUsername] = useState('');
 
   const cameraRef = useRef(null);
-  const [imageUri, setImageUri] = useState(null);
+  const [photo, setPhoto] = useState(null);
 
   useEffect(() => {
     whoAmI(setUsername)
@@ -49,8 +49,9 @@ export default function Camera() {
   }
 
   const handlePictureSaved = (photo) => {
-    console.log(photo)
-    setImageUri(photo.uri)
+      photo.path = "test-path.png"
+      console.log(photo)
+    setPhoto(photo)
   }
 
   function toggleCameraFacing() {
@@ -58,13 +59,13 @@ export default function Camera() {
   }
 
   const cameraState = () => {
-    if(imageUri) {
+    if(photo?.uri) {
         return (
             <View style={styles.imageContainer}>
-                <Image source={{ uri: imageUri }} style={styles.image} />
+                <Image source={{ uri: photo.uri }} style={styles.image} />
                 <View style={{display: "flex", flexDirection: "row"}}>
-                    <Button style={{flexGrow: 1}} text="Confirm" />
-                    <Button style={{flexGrow: 1}} text="Retake" onPress={() => setImageUri(null)} />
+                    <Button style={{flexGrow: 1}} onPress={() => savePhotoRequest(photo.base64)} text="Confirm" />
+                    <Button style={{flexGrow: 1}} text="Retake" onPress={() => setPhoto(null)} />
                 </View>
             </View>
         )

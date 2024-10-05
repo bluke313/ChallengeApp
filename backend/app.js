@@ -6,9 +6,13 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs")
 const multer = require('multer') //import for storing images
 const path = require('path')
+const { v4: uuidv4 } = require('uuid');
+const bodyParser = require('body-parser')
 
 // Set the web server
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json({ limit: "15MB" }))
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
@@ -322,6 +326,16 @@ router.route('/upload').post(async (req, res) => {
         })
         res.send(req.file)
     })
+})
+
+router.route('/savePhoto').post(authenticateToken, async (req, res) => {
+    console.log(req.body)
+    const base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
+    fs.writeFile(`./public/${uuidv4()}.png`, base64Data, 'base64', (err) => {
+        if(err) throw err
+    })
+    res.status(200).send({})
+
 })
 
 router.route('/i/:challengeId').get(authenticateToken, async (req, res) => {
