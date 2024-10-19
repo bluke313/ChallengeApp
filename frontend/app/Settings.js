@@ -12,6 +12,8 @@ const Settings = () => {
     const [user, setUser] = useState('');
     const [bio, setBio] = useState("");
     const [pfp, setPfp] = useState("");
+    const [bioChanged, setBioChanged] = useState(false);
+    const [updateResponse, setUpdateResponse] = useState("");
 
     const handleUpdate = async () => {
         try {
@@ -29,6 +31,10 @@ const Settings = () => {
                 }
             );
             const responseJson = await response.json();
+            if(response.ok) {
+                setBioChanged(false)
+                setUpdateResponse("Bio updated successfully")
+            }
         } catch (err) {
             console.error(err);
         }
@@ -75,16 +81,17 @@ const Settings = () => {
 
     return (
         <View style={styles.view}>
-            <Button text="Return" onPress={() => router.push(`/p/test`)} />
+            <Button text="Return" onPress={() => router.push(`/p/${user}`)} />
             <View style={styles.container}>
                 <Text style={styles.text}>Bio: </Text>
                 <StyledTextInput
                     defaultValue={bio}
                     value={bio}
-                    onChangeText={setBio}
+                    onChangeText={(e) => {setUpdateResponse(""); setBio(e); setBioChanged(true)}}
                 />
             </View>
-            <Button text="Update" onPress={handleUpdate} />
+            <Button text="Update" onPress={handleUpdate} disabled={!bioChanged}/>
+            <Text style={styles.updateResponseText}>{updateResponse}</Text>
         </View>
     );
 };
@@ -104,7 +111,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignContent: 'center',
+    },
+    updateResponseText: {
+        color: colors.accent,
+        textAlign: 'center',
+        marginTop: 12
     }
+
 });
 
 export default Settings;
