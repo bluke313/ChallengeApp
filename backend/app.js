@@ -83,7 +83,6 @@ function authenticateToken(req, res, next) {
         if (err) return res.status(403).send({"message": "You do not have permission to view this page."})
 
         req.body.userId = userId;
-        console.log("we got in", req.body.userId)
 
         next();
     })
@@ -419,7 +418,7 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
             else {
                 let userId = row.id
                 db.all(`
-                        SELECT i.path, i.timestamp, i.caption, i.id, i.userId, u.username FROM Images i 
+                        SELECT i.path, i.timestamp, i.caption, i.id, i.userId, u.username, u.pfpPath FROM Images i 
                         INNER JOIN Associations a
                         ON a.targetUserId = i.userId
                         INNER JOIN Users u
@@ -441,7 +440,7 @@ router.route('/feed').get(authenticateToken, async (req, res) => {
 
 router.route('/userFeed').post(authenticateToken, async (req, res) => {
     //priority query for current friends or former associates
-    db.all(`SELECT u.id, u.username, a.type FROM Associations a
+    db.all(`SELECT u.id, u.username, u.pfpPath, a.type FROM Associations a
             INNER JOIN Users u
             ON u.id = a.targetUserId
             WHERE a.userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)}
@@ -455,7 +454,7 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
             let exclusionString = matches.map((m) => m.id).join(',')
 
             //query to get all user's matching
-            db.all(`SELECT id, username FROM Users
+            db.all(`SELECT id, username, pfpPath FROM Users
                     WHERE username LIKE '%${req.body.query}%' AND id NOT IN (${exclusionString});`,
                 async (err, row) => {
                     if (err) {

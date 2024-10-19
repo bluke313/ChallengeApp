@@ -16,10 +16,15 @@ const FeedImage = ({ image }) => {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 style={isHovered
-                    ? { color: 'white', textDecorationLine: 'underline' }
-                    : { color: "white" }}
+                    ? { color: 'white', textDecorationLine: 'underline', ...styles.linkStyle }
+                    : { color: "white", ...styles.linkStyle }}
                 href={`/p/${image.username}`}
-            >{image.username}</Link>
+            >                  
+                <Image style={styles.userIcon} source={{
+                                uri: `http://localhost:3000/${image.pfpPath ? image.pfpPath.slice(7) : "Blank-Avatar.webp"}`,
+                }} />
+                {image.username}
+            </Link>
             <Pressable
                 onPress={() => router.push(`i/${image.id}`)}
                 key={`${image.id}-image`}
@@ -68,7 +73,7 @@ export const Feed = ({ user }) => {
     useEffect(() => { fetchFeed() }, []);
 
     return (
-        <View>
+        <View style={{display: "flex", gap: 50, marginBottom: 75, marginTop: 25}}>
             {feedData == null ? null : feedData.map((data, i) => <FeedImage key={i} image={data} />)}
         </View>
     )
@@ -174,12 +179,22 @@ const UsernameLink = ({ onClose, data, ...rest }) => {
             display: "block",
             width: "25px",
             height: "25px"
+        },
+        userIcon: {
+            borderRadius: 50,
+            width: 25,
+            height: 25,
         }
     })
 
     return (
         <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => { onClose(); router.push(`/p/${data.username}`); }}>
-            <Text style={styles.text}>{data.username}</Text>
+            <View style={{display: "flex", flexDirection: "row", alignItems: "center", gap: "4px"}}>
+                <Image style={styles.userIcon} source={{
+                                uri: `http://localhost:3000/${data.pfpPath ? data.pfpPath.slice(7) : "Blank-Avatar.webp"}`,
+                }} />
+                <Text style={styles.text}>{data.username}</Text>
+            </View>
             <SocialButton friendStatus={data.type} />
         </Pressable>
     )
@@ -269,12 +284,27 @@ export const ProfileFeed = ({ user, fresh }) => {
 const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
-        marginBottom: "100px",
+        // marginBottom: "100px",
         padding: 16,
         backgroundColor: "rgba(255,255,255,.15)",
         borderColor: colors.secondary,
         borderWidth: 1,
-        borderRadius: "10px"
+        borderRadius: "10px",
+    },
+    userIcon: {
+        borderRadius: 50,
+        width: 25,
+        height: 25,
+    },
+    linkStyle: {
+        fontSize: "20px",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: "8px",
+        justifyContent: "flex-start",
+        width: "100%",
+        marginBottom: "14px"
     },
     title: {
         fontSize: 24,
