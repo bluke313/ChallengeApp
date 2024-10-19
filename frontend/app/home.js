@@ -6,11 +6,13 @@ import { useState, useEffect, useRef } from 'react';
 import { Button, Tabs } from '@components/Button.js';
 import Search from './Search.js';
 import { fetchChallenge } from './Components/Network.js';
+import { colors } from '../assets/theme.js';
+import { Icon } from 'react-native-elements';
+
 
 const home = () => {
     const [username, setUsername] = useState('');
     const [modalShown, setModalShown] = useState(false);
-    const [activeChallenge, setActiveChallenge] = useState(null);
 
     const scrollViewRef = useRef(null);
 
@@ -55,27 +57,24 @@ const home = () => {
             }
         }
         fetchHome()
-        fetchChallenge(setActiveChallenge)
-
     }, []);
 
     return (
         <View style={styles.container}>
-
             <ScrollView ref={scrollViewRef} style={styles.content}>
                 <Text style={styles.title}>Home Page</Text>
-                <Text style={styles.title}>{activeChallenge?.name}</Text>
                 <Button onPress={() => setModalShown(true)} text='Search'/>
                 <Modal
                             animationType="slide"
                             transparent={true}
                             visible={modalShown}
                             onRequestClose={() => {
-                            setModalShown(!modalShown);
-                }}>
+                                setModalShown(!modalShown);
+                            }}>
                     <Search onClose={() => setModalShown(false)}/>
                 </Modal>
                 <Button onPress={() => { dropSecret('authToken'); router.push('/Login') }} text='Sign Out' />
+                <DailyQuestDisplay />
                 <Feed user={username} />
             </ScrollView>
 
@@ -84,6 +83,59 @@ const home = () => {
         </View>
     );
 };
+
+const DailyQuestDisplay = () => {
+    const [activeQuest, setActiveQuest] = useState(null)
+    const [minimized, setMinimized] = useState(false)
+
+    useEffect(() => {fetchChallenge(setActiveQuest)}, [])
+
+    const styles = StyleSheet.create({
+        questView: {
+            backgroundColor: colors.secondary,
+            marginTop: 16,
+            marginBottom: 16,
+            padding: 16,
+            borderRadius: "5px",
+            position: "relative"
+        },
+        name: {
+            fontSize: 24,
+            marginBottom: 16,
+            color: colors.text,
+        },
+        desc: {
+            fontSize: 16,
+            color: colors.text
+        },
+        collapseIcon: {
+            position: "absolute",
+            top: 18,
+            right: 18
+        }
+    });
+
+    if(minimized){
+        return (
+            <View style={styles.questView}>
+                <Text style={{...styles.name, marginBottom: 0}}>{activeQuest?.name}</Text>
+                <Pressable style={styles.collapseIcon} onPress={() => setMinimized(!minimized)}>
+                    <Icon name='plus' type='material-community' color={"white"} />
+                </Pressable>
+            </View>
+        )
+    }
+
+    return (
+        <View style={styles.questView}>
+            <Text style={styles.name}>{activeQuest?.name}</Text>
+            <Text style={styles.desc}>{"In today's quest your goal should be to spread joy to an old friend. However you do this just snap a pic of it and give it a share!"}</Text>
+            <Pressable style={styles.collapseIcon} onPress={() => setMinimized(!minimized)}>
+                <Icon name='minus' type='material-community' color={"white"} />
+            </Pressable>
+        </View>
+    )
+}
 
 const styles = StyleSheet.create({
     title: {
@@ -102,6 +154,25 @@ const styles = StyleSheet.create({
         padding: 16,
         alignContent: 'center',
     },
+    questView: {
+        backgroundColor: colors.secondary,
+        marginTop: 16,
+        marginBottom: 16,
+        padding: 16,
+        borderRadius: "5px"
+        // display: "flex",
+        // justifyContent: "center"
+    },
+    name: {
+        fontSize: 24,
+        marginBottom: 16,
+        // textAlign: 'center',
+        color: colors.text,
+    },
+    desc: {
+        fontSize: 16,
+        color: colors.text
+    }
 });
 
 export default home;

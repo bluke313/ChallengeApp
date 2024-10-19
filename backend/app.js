@@ -519,7 +519,6 @@ router.route('/challenge').get(authenticateToken, async (req, res) => {
                 res.status(500).send({ 'message': 'Database error!', 'success': false });
             }
             else{
-                console.log("Challenge fetched baby")
                 res.status(200).send(row)
             }
         }

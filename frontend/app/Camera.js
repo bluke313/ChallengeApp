@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, TouchableOpacity, View, Image } from 'reac
 import { Tabs, Button } from './Components/Button';
 import { router } from 'expo-router';
 import { fetchChallenge, photoUpload, savePhotoRequest, whoAmI } from './Components/Network';
+import { DailyQuestDisplay } from './Components/Quest';
 
 
 export default function Camera() {
@@ -19,7 +20,7 @@ export default function Camera() {
   useEffect(() => {
     whoAmI(setUsername)
     fetchChallenge(setActiveChallenge)
-}, [])
+  }, [])
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -75,7 +76,8 @@ export default function Camera() {
     else {
         return (
         <CameraView mirror={false} ref={cameraRef} style={styles.camera} facing={facing} zoom={1}>
-                <Text style={styles.text}>{activeChallenge?.name}</Text>
+                {/* <Text style={styles.text}>{activeChallenge?.name}</Text> */}
+                <DailyQuestDisplay setParentQuest={setActiveChallenge}/>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={takePicture}>
                     <Text style={styles.text}>Click</Text>

@@ -160,11 +160,11 @@ export const Tabs = ({ handleHome, handleProfile, currentPage }) => {
         onPress={handleProfile}>
         <Text style={styles.buttonText}>{`\u{1F9D1}`}</Text>
       </Pressable>
-      <Pressable
+      {/* <Pressable
         style={styles.tabsButton}
         onPress={handleChallengePress}>
         <Text style={styles.buttonText}>{`C`}</Text>
-      </Pressable>
+      </Pressable> */}
     </View>
   )
 };
