@@ -40,7 +40,6 @@ const SignUp = (props) => {
                 }
             );
             const responseJson = await response.json();
-            console.log(responseJson)
             if (responseJson.success) {
                 // props.handleLogin(responseJson.username);
                 await storeSecret('authToken', responseJson.token);

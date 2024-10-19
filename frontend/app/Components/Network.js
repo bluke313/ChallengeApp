@@ -37,7 +37,7 @@ export const whoAmI = async (setState) => {
 export const sendAssociationRequest = async (newCode, currentCode, targetUsername, setState) => {
     try {
         const token = await retrieveSecret('authToken')
-        console.log(`Token: ${token}`)
+        // console.log(`Token: ${token}`)
         const response = await fetch(
             'http://localhost:3000/associationRequest',
             {
@@ -65,7 +65,7 @@ export const sendAssociationRequest = async (newCode, currentCode, targetUsernam
 export const savePhotoRequest = async (base64, challengeId) => {
     try {
         const token = await retrieveSecret('authToken')
-        console.log(`Token: ${token}`)
+        // console.log(`Token: ${token}`)
         const response = await fetch(
             'http://localhost:3000/savePhoto',
             {
@@ -90,7 +90,7 @@ export const savePhotoRequest = async (base64, challengeId) => {
 export const fetchChallenge = async (setState) => {
     try {
         const token = await retrieveSecret('authToken')
-        console.log(`Token: ${token}`)
+        // console.log(`Token: ${token}`)
         const response = await fetch(
             'http://localhost:3000/challenge',
             {
@@ -127,7 +127,7 @@ export const photoUpload = async (photo) => {
 
     axios.post('http://localhost:3000/upload', data) //sends photo the backend
       .then((res) => {
-        console.log(res)
+        // console.log(res)
       })
 
     // fresh()

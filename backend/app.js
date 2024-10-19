@@ -22,15 +22,15 @@ const port = 3000
 const db = new sqlite3.Database('./database.db')
 
 //check if there are any active challenges
-async function getActiveChallenge(){
+async function getActiveChallenge() {
     return new Promise((resolve, reject) => {
         db.get('SELECT * FROM Challenges WHERE active = 1;', async (err, row) => {
-            if(err){
+            if (err) {
                 console.log("ERROR: isActiveChallenge", err)
                 reject(err)
             }
             else {
-                if(row == undefined){
+                if (row == undefined) {
                     resolve(null)
                 }
                 resolve(row)
@@ -70,17 +70,17 @@ function savePhoto(data, userId, uploadDate) {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-    if (token == null){
+    if (token == null) {
         console.log("authentication failed: ", req.headers['authorization'])
         return res.sendStatus(401)
     }
-        
+
 
     // console.log(authHeader)
     jwt.verify(token, "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi", (err, userId) => {
         // console.log(`Authenticate token ERROR: ${err}`);
 
-        if (err) return res.status(403).send({"message": "You do not have permission to view this page."})
+        if (err) return res.status(403).send({ "message": "You do not have permission to view this page." })
 
         req.body.userId = userId;
 
@@ -244,7 +244,6 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                             return
                         }
                         if (ownProfile) {
-                            console.log(bioRow)
                             res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow?.bio ? bioRow.bio : "", "pfpPath": bioRow.pfpPath.slice(7), "images": imagePaths, "ownProfile": ownProfile, "friendCount": row.friendCount })
                         }
                         else {
@@ -267,7 +266,6 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                                 if (row !== undefined) {
                                     friends = row.type
                                 }
-                                console.log(bioRow)
                                 res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "pfpPath": bioRow.pfpPath.slice(7), "images": imagePaths, "ownProfile": ownProfile, "friends": friends, "friendCount": friendCountRow.friendCount })
 
                             })
@@ -288,7 +286,8 @@ function formateImagePathsFromDBRows(rows) {
             "path": rows[i].path.slice(7),
             "caption": rows[i].caption,
             "timestamp": rows[i].timestamp,
-            "id": rows[i].id
+            "id": rows[i].id,
+            "pfpPath": rows[i].pfpPath,
         }
         if (Object.keys(rows[i]).includes("username")) {
             obj["username"] = rows[i].username
@@ -343,7 +342,6 @@ router.route('/pfpUpload').post(authenticateToken, async (req, res) => {
         }
         // console.log("/pfpUpload req body", JSON.parse(req.body.body))
         const filePath = req.file.path
-        console.log("in upload", username)
 
         db.run(`UPDATE Users SET pfpPath = '${filePath}' WHERE username = '${username}'`, async (err) => {
             if (err) {
@@ -360,8 +358,8 @@ router.route('/savePhoto').post(authenticateToken, async (req, res) => {
     const base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
     const filePath = `public/${uuidv4()}.png`
     fs.writeFile(filePath, base64Data, 'base64', (err) => {
-        if(err) throw err
-        else{
+        if (err) throw err
+        else {
             const username = req.body.userId.userId
             const caption = ""
             const timestamp = getDateTimeForDB()
@@ -386,7 +384,10 @@ router.route('/i/:challengeId').get(authenticateToken, async (req, res) => {
         res.sendStatus(500)
         return
     }
-    db.get(`SELECT path, timestamp, caption, id FROM Images WHERE id = ${Number(req.params.challengeId)};`,
+    db.get(`SELECT i.path, i.timestamp, i.caption, i.id, u.username, u.pfpPath 
+        FROM Images i
+        JOIN Users u ON i.userId = u.id
+        WHERE i.id = ${Number(req.params.challengeId)};`,
         async (err, row) => {
             if (err) {
                 console.log(`/i/[challengeId] ERROR: ${err}`);
@@ -462,7 +463,7 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
                         res.status(500).send({ 'message': 'Database error!', 'success': false });
                     }
                     else {
-                        let newMatches = row.map((elem) => ({...elem, type: -1}))
+                        let newMatches = row.map((elem) => ({ ...elem, type: -1 }))
                         matches = [...matches, ...newMatches]
                         res.status(200).send({ matches: matches });
                     }
@@ -540,41 +541,40 @@ router.route('/whoami').get(authenticateToken, async (req, res) => {
 //SELECT * FROM Challenges WHERE start = '2024-10-4 00:00:00';
 router.route('/challenge').get(authenticateToken, async (req, res) => {
     db.get(`SELECT * FROM Challenges WHERE active = 1;`, async (err, row) => {
-            if (err) {
-                console.log(`/challenge ERROR: ${err}`);
-                res.status(500).send({ 'message': 'Database error!', 'success': false });
-            }
-            else{
-                res.status(200).send(row)
-            }
+        if (err) {
+            console.log(`/challenge ERROR: ${err}`);
+            res.status(500).send({ 'message': 'Database error!', 'success': false });
         }
+        else {
+            res.status(200).send(row)
+        }
+    }
     )
 })
 
 router.route('/newChallenge').get(authenticateToken, async (req, res) => {
-    db.run(`UPDATE Challenges SET active = 0;`, async(err) => {
+    db.run(`UPDATE Challenges SET active = 0;`, async (err) => {
         //select new challenge for today
         db.all('SELECT id FROM Challenges where picked = 0;', async (err, row) => {
-            if(err){
+            if (err) {
                 console.log("ERROR: Selecting unpicked challenges", err)
-                res.status(500).send({"error": err})
+                res.status(500).send({ "error": err })
             }
             else {
-                console.log(row)
-                if(row.length == 0){
+                if (row.length == 0) {
                     db.run(`UPDATE Challenges SET picked = 0;`)
                     db.all('SELECT id FROM Challenges where picked = 0;', async (err, row) => {
-                        if(err){
+                        if (err) {
                             console.log("ERROR: Selecting unpicked challenges", err)
                         }
-                        else{
+                        else {
                             const newActiveChallengeId = row[Math.floor(Math.random() * row.length)]["id"]
                             db.run(`UPDATE Challenges SET picked = 1, active = 1 WHERE id = ${newActiveChallengeId}`, async (err) => {
-                                if(err){
+                                if (err) {
                                     console.log("ERROR: Selecting unpicked challenges", err)
-                                    res.status(500).send({"error": err})
+                                    res.status(500).send({ "error": err })
                                 }
-                                else{
+                                else {
                                     console.log("/newChallenge new challenge picked ", newActiveChallengeId)
                                     res.status(200).send({})
                                 }
@@ -582,15 +582,15 @@ router.route('/newChallenge').get(authenticateToken, async (req, res) => {
                         }
                     })
                 }
-                else{
+                else {
                     const newActiveChallengeId = row[Math.floor(Math.random() * row.length)]["id"]
                     console.log("New Active Challenge Id ", newActiveChallengeId)
                     db.run(`UPDATE Challenges SET picked = 1, active = 1 WHERE id = ${newActiveChallengeId}`, async (err) => {
-                        if(err){
+                        if (err) {
                             console.log("ERROR: Selecting unpicked challenges", err)
-                            res.status(500).send({"error": err})
+                            res.status(500).send({ "error": err })
                         }
-                        else{
+                        else {
                             console.log("/newChallenge new challenge picked ", newActiveChallengeId)
                             res.status(200).send({})
                         }
@@ -603,7 +603,7 @@ router.route('/newChallenge').get(authenticateToken, async (req, res) => {
 
 router.route('/updateProfile').post(authenticateToken, async (req, res) => {
     db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
-    res.status(200).send({  })
+    res.status(200).send({})
 });
 
 app.use(express.static('public'));

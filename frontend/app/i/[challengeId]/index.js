@@ -4,7 +4,8 @@ import { retrieveSecret } from '../../Storage.js'
 import { router, useGlobalSearchParams } from 'expo-router';
 import { Button, Tabs } from '@components/Button.js';
 import { whoAmI } from '../../Components/Network.js';
-
+import { UsernameWithPicture } from '../../Components/Feed.js';
+ 
 export default function Challenge({ challenge }) {
     const [photoData, setPhotoData] = useState(null)
     const [username, setUsername] = useState(null)
@@ -30,10 +31,8 @@ export default function Challenge({ challenge }) {
                     }
                 );
                 const responseJson = await response.json();
-                // console.log(responseJson)
                 setPhotoData(responseJson)
                 // setChallenges(responseJson.images)
-                // console.log(`Found File Data: ${photoData}`);
             } catch (error) {
                 console.error(error);
             }
@@ -44,11 +43,11 @@ export default function Challenge({ challenge }) {
 
     return (
         <View style={styles.container}>
-
             <View style={styles.content}>
                 <Button onPress={() => router.back()} text='Return' />
                 {photoData == null ? <Text style={styles.errorText}>IMAGE NOT FOUND</Text> :
                     <View style={styles.imageContainer}>
+                        <UsernameWithPicture username={photoData.username} pfpPath={photoData.pfpPath} />
                         <Image
                             style={styles.image}
                             source={{

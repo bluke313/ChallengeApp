@@ -3,7 +3,6 @@ import { colors } from "../../assets/theme";
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { retrieveSecret } from "../Storage";
-// import userIcon from '/'
 
 export default function IndicatorButton({ children }) {
   return (
@@ -46,7 +45,7 @@ export const Tabs = ({ handleHome, handleProfile, currentPage }) => {
   const handleChallengePress = async () => {
       try {
           const token = await retrieveSecret('authToken')
-          console.log(`Token: ${token}`)
+          // console.log(`Token: ${token}`)
           const response = await fetch(
               'http://localhost:3000/newChallenge',
               {

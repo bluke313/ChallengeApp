@@ -53,7 +53,6 @@ export default function Camera() {
 
   const handlePictureSaved = (photo) => {
       photo.path = "test-path.png"
-      console.log(photo)
     setPhoto(photo)
   }
 

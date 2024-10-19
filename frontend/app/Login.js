@@ -37,7 +37,6 @@ const Login = (props) => {
                 }
             );
             const responseJson = await response.json();
-            console.log(responseJson)
             if (responseJson.success) {
                 await storeSecret('authToken', responseJson.token)
                 router.push(`/home`);

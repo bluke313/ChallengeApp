@@ -29,7 +29,7 @@ const home = () => {
         const fetchHome = async () => {
             try {
                 const token = await retrieveSecret('authToken')
-                console.log(`Token: ${token}`)
+                // console.log(`Token: ${token}`)
                 const response = await fetch(
                     'http://localhost:3000/home',
                     {
@@ -47,7 +47,6 @@ const home = () => {
                     setUsername(responseJson.username)
                 }
                 else {
-                    console.log('pushing')
                     dropSecret('authToken')
                     router.push('/Login')
                 }

@@ -7,24 +7,9 @@ import { Icon } from 'react-native-elements';
 import { sendAssociationRequest, whoAmI } from '@components/Network.js'
 
 const FeedImage = ({ image }) => {
-    const [isHovered, setIsHovered] = useState(false);
-
-    console.log(image)
     return (
         <View style={styles.container}>
-            <Link
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                style={isHovered
-                    ? { color: 'white', textDecorationLine: 'underline', ...styles.linkStyle }
-                    : { color: "white", ...styles.linkStyle }}
-                href={`/p/${image.username}`}
-            >                  
-                <Image style={styles.userIcon} source={{
-                                uri: `http://localhost:3000/${image.pfpPath ? image.pfpPath.slice(7) : "Blank-Avatar.webp"}`,
-                }} />
-                {image.username}
-            </Link>
+            <UsernameWithPicture username={image.username} pfpPath={image.pfpPath}/>
             <Pressable
                 onPress={() => router.push(`i/${image.id}`)}
                 key={`${image.id}-image`}
@@ -40,6 +25,24 @@ const FeedImage = ({ image }) => {
             <Text style={styles.timestamp}>Uploaded {image.timestamp}</Text>
         </View>
     )
+};
+
+export const UsernameWithPicture = ({ username, pfpPath }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    return (
+        <Text
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={isHovered
+                ? { color: 'white', textDecorationLine: 'underline', ...styles.linkStyle }
+                : { color: "white", ...styles.linkStyle }}
+            onPress={() => router.push(`/p/${username}`)}
+        >
+            <Image style={styles.userIcon} source={{
+                uri: `http://localhost:3000/${pfpPath ? pfpPath.slice(7) : "Blank-Avatar.webp"}`,
+            }} />
+            {username}
+        </Text>)
 };
 
 export const Feed = ({ user }) => {
@@ -73,7 +76,7 @@ export const Feed = ({ user }) => {
     useEffect(() => { fetchFeed() }, []);
 
     return (
-        <View style={{display: "flex", gap: 50, marginBottom: 75, marginTop: 25}}>
+        <View style={{ display: "flex", gap: 50, marginBottom: 75, marginTop: 25 }}>
             {feedData == null ? null : feedData.map((data, i) => <FeedImage key={i} image={data} />)}
         </View>
     )
@@ -189,29 +192,28 @@ const UsernameLink = ({ onClose, data, ...rest }) => {
 
     return (
         <Pressable style={hover ? styles.linkHover : styles.link} {...rest} onHoverIn={() => setHover(true)} onHoverOut={() => setHover(false)} onPress={() => { onClose(); router.push(`/p/${data.username}`); }}>
-            <View style={{display: "flex", flexDirection: "row", alignItems: "center", gap: "4px"}}>
+            <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "4px" }}>
                 <Image style={styles.userIcon} source={{
-                                uri: `http://localhost:3000/${data.pfpPath ? data.pfpPath.slice(7) : "Blank-Avatar.webp"}`,
+                    uri: `http://localhost:3000/${data.pfpPath ? data.pfpPath.slice(7) : "Blank-Avatar.webp"}`,
                 }} />
                 <Text style={styles.text}>{data.username}</Text>
             </View>
             <SocialButton friendStatus={data.type} />
         </Pressable>
     )
-}
+};
 
 export const ProfileFeed = ({ user, fresh }) => {
     const [challenges, setChallenges] = useState([])
     const [username, setUsername] = useState(null)
     const localParams = useGlobalSearchParams()
-    // console.log(`params: ${localParams.id}`)
 
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
                 const token = await retrieveSecret('authToken')
-                console.log(`Token: ${token}`)
+                // console.log(`Token: ${token}`)
                 const response = await fetch(
                     'http://localhost:3000/profile',
                     {
@@ -230,7 +232,6 @@ export const ProfileFeed = ({ user, fresh }) => {
 
                 if (response.status === 200) {
                     setChallenges(responseJson.images)
-                    console.log(responseJson.images)
                 }
             } catch (error) {
                 console.error(error);
@@ -263,7 +264,7 @@ export const ProfileFeed = ({ user, fresh }) => {
         <View style={styles.challengeFeed}>
             {challenges == [] ? null : challenges.map((item, i) =>
                 <Pressable
-                    style={{ borderColor: '#38c880', borderWidth: 1}}
+                    style={{ borderColor: '#38c880', borderWidth: 1 }}
                     onPress={() => router.push(`i/${item.id}`)}
                     key={`${user}-image-${i}`}
                 >
@@ -277,7 +278,7 @@ export const ProfileFeed = ({ user, fresh }) => {
             )}
         </View>
     )
-}
+};
 
 
 

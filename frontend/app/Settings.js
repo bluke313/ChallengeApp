@@ -45,7 +45,7 @@ const Settings = () => {
         const fetchProfile = async () => {
             try {
                 const token = await retrieveSecret('authToken')
-                console.log(`Token: ${token}`)
+                // console.log(`Token: ${token}`)
                 const response = await fetch(
                     'http://localhost:3000/profile',
                     {

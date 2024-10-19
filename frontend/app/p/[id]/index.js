@@ -4,7 +4,6 @@ import { Link, router, useGlobalSearchParams } from 'expo-router';
 import { shouldUseActivityState } from 'react-native-screens';
 
 
-import IndicatorButton from '@components/Button.js';
 import TabSelect, { TabArea } from '@components/Tabs.js';
 import PhotoUpload from '@components/PhotoUpload.js';
 import { retrieveSecret } from '../../Storage.js'
@@ -44,7 +43,7 @@ const Profile = () => {
         const fetchProfile = async () => {
             try {
                 const token = await retrieveSecret('authToken')
-                console.log(`Token: ${token}`)
+                // console.log(`Token: ${token}`)
                 const response = await fetch(
                     'http://localhost:3000/profile',
                     {
@@ -68,7 +67,6 @@ const Profile = () => {
                     setBio(responseJson.bio);
                     setPfpPath(responseJson.pfpPath)
                     if (!responseJson.ownProfile) {
-                        console.log("setting friend status to: " + responseJson.friends)
                         setFriendStatus(responseJson.friends)
                     }
                 }
