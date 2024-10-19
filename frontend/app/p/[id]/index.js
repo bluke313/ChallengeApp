@@ -24,6 +24,7 @@ const Profile = () => {
     const [friendCount, setFriendCount] = useState(0);
     const [user, setUser] = useState(null);
     const [bio, setBio] = useState("");
+    const [pfpPath, setPfpPath] = useState(null);
     const [fresh, setFresh] = useState(true);
     const [ownProfile, setOwnProfile] = useState(false);
     const [modalShown, setModalShown] = useState(false);
@@ -65,6 +66,7 @@ const Profile = () => {
                     setOwnProfile(responseJson.ownProfile);
                     setFriendCount(responseJson.friendCount);
                     setBio(responseJson.bio);
+                    setPfpPath(responseJson.pfpPath)
                     if (!responseJson.ownProfile) {
                         console.log("setting friend status to: " + responseJson.friends)
                         setFriendStatus(responseJson.friends)
@@ -133,7 +135,9 @@ const Profile = () => {
                 <View style={styles.topView}>
                     <Text style={styles.username}>{glob.id}</Text>
                     <Pressable style={styles.profileButton} onPress={ownProfile ? () => router.push('/Settings') : null}>
-                        <Image style={styles.userIcon} source={require("./example-user-icon.jpg")} />
+                        <Image style={styles.userIcon} source={{
+                            uri: `http://localhost:3000/${pfpPath ? pfpPath : "Blank-Avatar.webp"}`,
+                        }} />
                     </Pressable>
                 </View>
 

@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { View, Image, Button, Platform } from 'react-native';
 import axios from 'axios';
-import retrieveSecret from '../Storage.js'
+import { retrieveSecret } from '../Storage.js'
 
-export default function PhotoUpload({username, fresh}) {
+export default function PhotoUpload({username}) {
     const [photo, setPhoto] = useState(null)
 
     const handleChoosePhoto = () => {
@@ -16,21 +16,30 @@ export default function PhotoUpload({username, fresh}) {
     }
 
     const handlePhotoUpload = async () => {
-        const data = new FormData() //creates binary to transfer photo
-        data.append('file', photo) //adds photo to the binary
-        data.append('body', JSON.stringify({
-          "caption": "Hey this is my photo",
-          // "token": `${retrieveSecret('authToken')}`,
-          "username": username
-        }))
+        try {
+          const token = await retrieveSecret('authToken')
+          const data = new FormData() //creates binary to transfer photo
+          data.append('file', photo) //adds photo to the binary
+          data.append('body', JSON.stringify({
+            "username": username
+          }))
+          // data.append('headers', JSON.stringify({
+          //   'Accept': 'application/json',
+          //   'authorization': `Bearer ${token}`,
+          // }))
 
-        axios.post('http://localhost:3000/upload', data) //sends photo the backend
-          .then((res) => {
-            console.log(res)
-          })
-
-        fresh()
-      };
+          axios.post('http://localhost:3000/pfpUpload', data, {headers: {
+            'authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          }}) //sends photo the backend
+            .then((res) => {
+              console.log(res)
+            })
+        
+        } catch (err) {
+          console.error(err)
+        }
+      }
     
 
     return (

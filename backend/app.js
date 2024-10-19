@@ -70,7 +70,11 @@ function savePhoto(data, userId, uploadDate) {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401)
+    if (token == null){
+        console.log("authentication failed: ", req.headers['authorization'])
+        return res.sendStatus(401)
+    }
+        
 
     // console.log(authHeader)
     jwt.verify(token, "$2b$10$DvnXTDsn2.tKRq6zXnEFJOM62eDSZfIAtDqC3WVZZ1V5Qcv/kBfHi", (err, userId) => {
@@ -79,6 +83,7 @@ function authenticateToken(req, res, next) {
         if (err) return res.status(403).send({"message": "You do not have permission to view this page."})
 
         req.body.userId = userId;
+        console.log("we got in", req.body.userId)
 
         next();
     })
@@ -224,7 +229,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
         }
         const imagePaths = formateImagePathsFromDBRows(row)
 
-        db.get(`SELECT bio FROM Users WHERE username = '${pageUserName}';`, async (err, row) => {
+        db.get(`SELECT bio, pfpPath FROM Users WHERE username = '${pageUserName}';`, async (err, row) => {
             if (err) {
                 console.log(`/profile ERROR: ${err}`);
                 res.status(500).send({ "message": "Database error!", "success": false })
@@ -241,7 +246,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                         }
                         if (ownProfile) {
                             console.log(bioRow)
-                            res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friendCount": row.friendCount })
+                            res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow?.bio ? bioRow.bio : "", "pfpPath": bioRow.pfpPath.slice(7), "images": imagePaths, "ownProfile": ownProfile, "friendCount": row.friendCount })
                         }
                         else {
                             const friendCountRow = row
@@ -264,7 +269,7 @@ router.route('/profile').post(authenticateToken, async (req, res) => {
                                     friends = row.type
                                 }
                                 console.log(bioRow)
-                                res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "images": imagePaths, "ownProfile": ownProfile, "friends": friends, "friendCount": friendCountRow.friendCount })
+                                res.status(200).send({ "username": req.body.userId.userId, "bio": bioRow ? bioRow.bio : "", "pfpPath": bioRow.pfpPath.slice(7), "images": imagePaths, "ownProfile": ownProfile, "friends": friends, "friendCount": friendCountRow.friendCount })
 
                             })
                         }
@@ -327,6 +332,28 @@ router.route('/upload').post(async (req, res) => {
             db.run(`INSERT INTO Images (path, timestamp, userId, caption) VALUES ('${filePath}', '${timestamp}', ${userId}, '${caption}')`)
         })
         res.send(req.file)
+    })
+})
+
+router.route('/pfpUpload').post(authenticateToken, async (req, res) => {
+    const username = req.body.userId.userId
+    upload(req, res, (err) => { //initiates the storage function for the photo
+        if (err) {
+            console.log(`/upload ERROR: ${err}`);
+            res.sendStatus(500)
+        }
+        // console.log("/pfpUpload req body", JSON.parse(req.body.body))
+        const filePath = req.file.path
+        console.log("in upload", username)
+
+        db.run(`UPDATE Users SET pfpPath = '${filePath}' WHERE username = '${username}'`, async (err) => {
+            if (err) {
+                console.log(`/upload ERROR: ${err}`);
+                res.status(500).send({ "message": "Database error!", "success": false })
+                return
+            }
+            res.send(req.file)
+        })
     })
 })
 

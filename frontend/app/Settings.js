@@ -6,6 +6,7 @@ import { Button, Tabs } from '@components/Button.js';
 import { colors } from '../assets/theme';
 import { StyledTextInput } from './Components/Input';
 import { retrieveSecret } from './Storage';
+import PhotoUpload from '@components/PhotoUpload.js'
 
 
 const Settings = () => {
@@ -89,6 +90,11 @@ const Settings = () => {
                     value={bio}
                     onChangeText={(e) => {setUpdateResponse(""); setBio(e); setBioChanged(true)}}
                 />
+                
+            </View>
+            <View style={styles.container}>
+                <Text style={styles.text}>Profile Picture: </Text>
+                <PhotoUpload />
             </View>
             <Button text="Update" onPress={handleUpdate} disabled={!bioChanged}/>
             <Text style={styles.updateResponseText}>{updateResponse}</Text>
@@ -103,7 +109,7 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-        fontSize: 24,
+        fontSize: 16,
         marginRight: 5,
     },
     container: {
@@ -111,6 +117,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignContent: 'center',
+        alignItems: 'center'
     },
     updateResponseText: {
         color: colors.accent,
