@@ -11,12 +11,8 @@ import { ProfileFeed } from '@components/Feed.js'
 import { Button, Tabs } from '@components/Button.js';
 import { StyledTextInput } from '@components/Input.js'
 import { sendAssociationRequest } from '@components/Network.js'
+import { FriendsList } from '../../Search.js';
 
-function GroupModal() {
-    return (
-        <View><Text>Hello Groups!</Text></View>
-    )
-}
 
 const Profile = () => {
     const [active, setActive] = useState(0);
@@ -144,16 +140,15 @@ const Profile = () => {
                 <View style={styles.infoView}>
                     <View style={styles.socialButtonView}>
                         <Button style={{ flexGrow: 1 }} text={`${friendCount} Group Mates`} onPress={() => setModalShown(!modalShown)} />
-                        {/* <Modal
+                        <Modal
                             animationType="slide"
-                            transparent={false}
+                            transparent={true}
                             visible={modalShown}
                             onRequestClose={() => {
                             setModalVisible(!modalShown);
                         }}>
-                            <GroupModal />
-                            <Button text={"close modal"} onPress={() => setModalShown(false)}/>
-                        </Modal> */}
+                            <FriendsList onClose={() => setModalShown(false)}/>
+                        </Modal>
                         <SocialButton />
                     </View>
                     <View style={styles.bufferStyle}></View>

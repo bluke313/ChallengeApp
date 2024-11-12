@@ -2,13 +2,13 @@ import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useState, useEffect, useRef } from 'react';
 import { Button, Tabs } from '@components/Button.js';
 import { StyledTextInput } from '@components/Input.js';
-import { UserFeed } from '@components/Feed.js';
+import { UserFeed, FriendsFeed } from '@components/Feed.js';
 import { whoAmI } from './Components/Network.js';
 import { PrimaryButton } from './Components/Button.js';
 import { router } from 'expo-router';
 
 
-const Search = ({onClose}) => {
+export const Search = ({onClose}) => {
 
     const [searchText, setSearchText] = useState('');
     const [username, setUsername] = useState(null);
@@ -34,7 +34,34 @@ const Search = ({onClose}) => {
             {/* <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/> */}
         </View>
     );
+};
 
+export const FriendsList = ({onClose}) => {
+
+    const [searchText, setSearchText] = useState('');
+    const [username, setUsername] = useState(null);
+    
+    useEffect(() => {
+        whoAmI(setUsername)
+    }, [])
+
+    
+
+    return (
+        <View style={styles.container}>
+            <Button text="close" onPress={onClose}/>
+            <ScrollView style={styles.content}>
+                <Text style={styles.title}>Group Mates</Text>
+                <StyledTextInput
+                    placeholder="Search user"
+                    value={searchText}
+                    onChangeText={setSearchText}
+                />
+                <FriendsFeed onClose={onClose} searchText={searchText}/>
+            </ScrollView>
+            {/* <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/> */}
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -56,5 +83,3 @@ const styles = StyleSheet.create({
         alignContent: 'center',
     },
 });
-
-export default Search;

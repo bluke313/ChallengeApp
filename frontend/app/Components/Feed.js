@@ -9,7 +9,7 @@ import { sendAssociationRequest, whoAmI } from '@components/Network.js'
 const FeedImage = ({ image }) => {
     return (
         <View style={styles.container}>
-            <UsernameWithPicture username={image.username} pfpPath={image.pfpPath}/>
+            <UsernameWithPicture username={image.username} pfpPath={image.pfpPath} />
             <Pressable
                 onPress={() => router.push(`i/${image.id}`)}
                 key={`${image.id}-image`}
@@ -124,6 +124,62 @@ export const UserFeed = ({ onClose, user, searchText }) => {
 
         <View style={styles.container}>
             {feedData == null ? null : (feedData.length == 0 ? <Text style={{ opacity: '50%', color: colors.accent }}>No Results Found</Text> : feedData.map((data, i) => <UsernameLink onClose={onClose} key={i} data={data} />))}
+        </View>
+    )
+};
+
+export const FriendsFeed = ({ onClose, user, searchText }) => {
+
+    const [feedData, setFeedData] = useState(null);
+
+    const fetchFeed = async () => {
+        try {
+            
+            const token = await retrieveSecret('authToken')
+            const response = await fetch(
+                'http://localhost:3000/friendsFeed',
+                {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'content-Type': 'application/json',
+                        authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ query: searchText })
+                }
+            );
+            const responseJson = await response.json();
+            console.log(responseJson.matches);
+            setFeedData(responseJson.matches);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    useEffect(() => {fetchFeed()}, [searchText]);
+
+    const styles = StyleSheet.create({
+        container: {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 8,
+        }
+    })
+
+    return (
+
+        <View style={styles.container}>
+            {feedData == null ?
+                null
+                :
+                (feedData.length == 0 ?
+                    <Text style={{ opacity: '50%', color: colors.accent }}>No Results Found</Text>
+                    :
+                    feedData.map((data, i) => <UsernameLink onClose={onClose} key={i} data={data} />)
+                )
+            }
         </View>
     )
 };

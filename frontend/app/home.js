@@ -4,7 +4,7 @@ import { dropSecret, retrieveSecret } from './Storage.js';
 import { Feed } from '@components/Feed.js';
 import { useState, useEffect, useRef } from 'react';
 import { Button, Tabs } from '@components/Button.js';
-import Search from './Search.js';
+import { Search } from './Search.js';
 import { fetchChallenge } from './Components/Network.js';
 import { colors } from '../assets/theme.js';
 import { Icon } from 'react-native-elements';
