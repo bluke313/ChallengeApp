@@ -83,6 +83,7 @@ const Settings = () => {
     return (
         <View style={styles.view}>
             <Button text="Return" onPress={() => router.push(`/p/${user}`)} />
+
             <View style={styles.container}>
                 <Text style={styles.text}>Bio: </Text>
                 <StyledTextInput
@@ -90,13 +91,14 @@ const Settings = () => {
                     value={bio}
                     onChangeText={(e) => {setUpdateResponse(""); setBio(e); setBioChanged(true)}}
                 />
-                
+            <Button text="Update" onPress={handleUpdate} disabled={!bioChanged}/>
             </View>
-            <View style={styles.container}>
+
+            <View style={styles.pfpUploadContainer}>
                 <Text style={styles.text}>Profile Picture: </Text>
                 <PhotoUpload/>
             </View>
-            <Button text="Update" onPress={handleUpdate} disabled={!bioChanged}/>
+            
             <Text style={styles.updateResponseText}>{updateResponse}</Text>
         </View>
     );
@@ -115,6 +117,13 @@ const styles = StyleSheet.create({
     container: {
         display: 'flex',
         flexDirection: 'row',
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center'
+    },
+    pfpUploadContainer: {
+        display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'center',
         alignContent: 'center',
         alignItems: 'center'

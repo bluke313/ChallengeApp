@@ -147,7 +147,7 @@ export const Tabs = ({ handleHome, handleProfile, currentPage }) => {
           ? styles.hoveredTabsButton
           : (isHoveredPic ? styles.hoveredTabsButton : styles.tabsButton) }
         onPress={() => router.push('/Camera')}>
-        <Text style={styles.buttonText}>{"camera"}</Text>
+        <Text style={styles.buttonText}>{`\u{1F4F7}`}</Text>
       </Pressable>
 
       <Pressable
