@@ -84,25 +84,25 @@ const Profile = () => {
 
     //Liam | UX/UI Designer 🎨 | Turning ideas into seamless experiences ✨ | Coffee addict ☕ | Always sketching the next big thing 🚀
 
-    const ProfileData = () => {
-        if (!ownProfile) {
-            return (
-                <View>
-                    <ProfileFeed user={glob.id} fresh={fresh} />
-                </View>
-            )
-        }
+    // const ProfileData = () => {
+    //     if (!ownProfile) {
+    //         return (
+    //             <View>
+    //                 <ProfileFeed user={glob.id} fresh={fresh} />
+    //             </View>
+    //         )
+    //     }
 
-        return (
-            <View>
-                <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
-                <TabArea active={active}>
-                    <ProfileFeed user={user} fresh={fresh} />
-                    <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
-                </TabArea>
-            </View>
-        )
-    }
+    //     return (
+    //         <View>
+    //             <TabSelect active={active} setActive={(i) => setActive(i)} tabItems={["Challenges", "Personal Info"]} />
+    //             <TabArea active={active}>
+    //                 <ProfileFeed user={user} fresh={fresh} />
+    //                 <PhotoUpload fresh={() => setFresh(!fresh)} username={user} />
+    //             </TabArea>
+    //         </View>
+    //     )
+    // }
 
     const SocialButton = () => {
         if (friendStatus == -2) {

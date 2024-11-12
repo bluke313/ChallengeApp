@@ -6,13 +6,27 @@ import { retrieveSecret } from '../Storage.js'
 
 export default function PhotoUpload({ username }) {
   const [photo, setPhoto] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleChoosePhoto = () => {
     launchImageLibrary({ noData: true }, (resp) => {
       if (resp) {
-        setPhoto(resp)
+        setPhoto(resp);
       }
     })
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setPhoto(file);
+
+    if (file) { 
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   const handlePhotoUpload = async () => {
@@ -36,6 +50,7 @@ export default function PhotoUpload({ username }) {
       }) //sends photo the backend
         .then((res) => {
           console.log(res)
+        setPhoto(null);
         })
 
     } catch (err) {
@@ -49,19 +64,20 @@ export default function PhotoUpload({ username }) {
       <input
         type='file'
         name='file'
-        onChange={(e) => setPhoto(e.target.files[0])}
+        onChange={handleImageChange}
         accept='.png,.jpg,.webp'
       />
       {photo && (
         <>
           <Image
-            source={{ uri: photo.uri }}
-            style={{ width: 300, height: 250 }}
+            source={{ uri: previewUrl }}
+            style={{ width: 300, height: 250, marginTop: 25, marginBottom: 25 }}
+            resizeMode="contain"
           />
+          {/* <Button title={previewUrl}></Button> */}
           <Button title="Upload Photo" onPress={handlePhotoUpload} />
         </>
       )}
-      {/* <Button title="Choose Photo" onPress={handleChoosePhoto} /> */}
     </View>
   );
 }

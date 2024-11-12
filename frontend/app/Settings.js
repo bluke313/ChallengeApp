@@ -94,7 +94,7 @@ const Settings = () => {
             </View>
             <View style={styles.container}>
                 <Text style={styles.text}>Profile Picture: </Text>
-                <PhotoUpload />
+                <PhotoUpload/>
             </View>
             <Button text="Update" onPress={handleUpdate} disabled={!bioChanged}/>
             <Text style={styles.updateResponseText}>{updateResponse}</Text>
