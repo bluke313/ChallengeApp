@@ -147,7 +147,7 @@ const Profile = () => {
                             onRequestClose={() => {
                             setModalVisible(!modalShown);
                         }}>
-                            <FriendsList onClose={() => setModalShown(false)}/>
+                            <FriendsList user={glob.id} onClose={() => setModalShown(false)}/>
                         </Modal>
                         <SocialButton />
                     </View>

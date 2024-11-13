@@ -36,7 +36,7 @@ export const Search = ({onClose}) => {
     );
 };
 
-export const FriendsList = ({onClose}) => {
+export const FriendsList = ({onClose, user}) => {
 
     const [searchText, setSearchText] = useState('');
     const [username, setUsername] = useState(null);
@@ -57,7 +57,7 @@ export const FriendsList = ({onClose}) => {
                     value={searchText}
                     onChangeText={setSearchText}
                 />
-                <FriendsFeed onClose={onClose} searchText={searchText}/>
+                <FriendsFeed user={user} onClose={onClose} searchText={searchText}/>
             </ScrollView>
             {/* <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/> */}
         </View>

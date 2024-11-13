@@ -145,7 +145,7 @@ export const FriendsFeed = ({ onClose, user, searchText }) => {
                         'content-Type': 'application/json',
                         authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ query: searchText })
+                    body: JSON.stringify({ query: searchText, user: user ? user : null })
                 }
             );
             const responseJson = await response.json();
