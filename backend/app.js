@@ -476,45 +476,58 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
 })
 
 router.route('/friendsFeed').post(authenticateToken, async (req, res) => {
-    const profileSearchingFrom = req.body.user ? req.body.user : req.body.userId.userId
+    const viewedProfile = req.body.user ? req.body.user : req.body.userId.userId
+    //  AND u.username LIKE '%${req.body.query}%'
     //priority query for current friends or former associates
-    db.all(`SELECT u.id, u.username, u.pfpPath, a.type FROM Associations a
-            INNER JOIN Users u
+    // u1 = logged in
+    // u2 = viewed profile
+    db.all(`SELECT u.id, u.username, u.pfpPath 
+            FROM Users u
+            INNER JOIN Associations a
             ON u.id = a.targetUserId
-            WHERE a.userId = ${getSQLStringUserIdFromUsername(profileSearchingFrom)}
-            AND u.username LIKE '%${req.body.query}%'
-            AND a.type = 1;`, async (err, row) => {
+            WHERE a.userId = ${getSQLStringUserIdFromUsername(viewedProfile)}
+                AND a.type = 1;`, async (err, row) => {
         if (err) {
             console.log(`/userFeed associate query ERROR: ${err}`);
             res.status(500).send({ 'message': 'Database error!', 'success': false });
         }
-        // else if(req.body.user != req.body.userId.userId) {
-        //     let matches = row
-        //     let inclusionString = matches.map((m) => m.id).join(',')
-        //     matches = row.map((elem) => ({ ...elem, type: -1 }))
-
-
-        //     //query to get all user's matching
-        //     db.all(`SELECT u.id, u.username, u.pfpPath, a.type FROM Associations a
-        //             INNER JOIN Users u
-        //             ON u.id = a.targetUserId
-        //             WHERE a.userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)}
-        //             AND u.id IN (${inclusionString});`,
-        //         async (err, row) => {
-        //             if (err) {
-        //                 console.log(`/userFeed non-associate query ERROR: ${err}`);
-        //                 res.status(500).send({ 'message': 'Database error!', 'success': false });
-        //             }
-        //             else {
-        //                 let newMatches = row
-        //                 matches = [...matches, ...newMatches]
-        //                 res.status(200).send({ matches: matches });
-        //             }
-        //         })
-
-        //     }
-        else{
-            res.status(200).send({ matches: row });
+        else {
+            console.log(row);
+            let viewedProfileFriends = row;
+            db.all(`SELECT u.id, u.username, u.pfpPath, a.type
+                FROM Associations a
+                INNER JOIN Users u
+                ON u.id = a.targetUserId
+                WHERE a.userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)};`, async (err, row) => {
+                if (err) {
+                    console.log(`/userFeed associate query ERROR: ${err}`);
+                    res.status(500).send({ 'message': 'Database error!', 'success': false });
+                }
+                else {
+                    let finalResult = [];
+                    viewedProfileFriends.forEach((f) => {
+                        let found = false;
+                        if (f.username === req.body.userId.userId) {
+                            let temp = f;
+                            temp.type = -2;
+                            finalResult.push(temp);
+                            return;
+                        }
+                        row.forEach((u1) => {
+                            if (u1.id == f.id) {
+                                finalResult.push(u1);
+                                found = true;
+                            }
+                        });
+                        if (found === false) {
+                            let temp = f;
+                            temp.type = -1;
+                            finalResult.push(temp);
+                        }
+                    });
+                    res.status(200).send({ matches: finalResult });
+                }
+            })
         }
     })
 })

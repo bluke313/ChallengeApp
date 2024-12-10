@@ -123,7 +123,14 @@ export const UserFeed = ({ onClose, user, searchText }) => {
     return (
 
         <View style={styles.container}>
-            {feedData == null ? null : (feedData.length == 0 ? <Text style={{ opacity: '50%', color: colors.accent }}>No Results Found</Text> : feedData.map((data, i) => <UsernameLink onClose={onClose} key={i} data={data} />))}
+            {feedData == null ? 
+                null 
+                : 
+                (feedData.length == 0 ? 
+                    <Text style={{ opacity: '50%', color: colors.accent }}>No Results Found</Text> 
+                    : 
+                    feedData.map((data, i) => <UsernameLink onClose={onClose} key={i} data={data} />))
+            }
         </View>
     )
 };
@@ -199,9 +206,14 @@ const UsernameLink = ({ onClose, data, ...rest }) => {
                 <Pressable onPress={() => sendAssociationRequest(-1, friendStatus, data.username, setFriendStatus)} style={styles.plusView}><Icon name='account-clock' type='material-community' color={"orange"} /></Pressable>
             )
         }
-        else {
+        else if (friendStatus == 1) {
             return (
                 <View style={styles.plusView}><Icon name='account-heart' type='material-community' color={colors.accent} /></View>
+            )
+        }
+        else {
+            return (
+                <View style={styles.plusView}></View>
             )
         }
     }
