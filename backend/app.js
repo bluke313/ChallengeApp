@@ -477,7 +477,6 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
 
 router.route('/friendsFeed').post(authenticateToken, async (req, res) => {
     const viewedProfile = req.body.user ? req.body.user : req.body.userId.userId
-    //  AND u.username LIKE '%${req.body.query}%'
     //priority query for current friends or former associates
     // u1 = logged in
     // u2 = viewed profile
@@ -486,6 +485,7 @@ router.route('/friendsFeed').post(authenticateToken, async (req, res) => {
             INNER JOIN Associations a
             ON u.id = a.targetUserId
             WHERE a.userId = ${getSQLStringUserIdFromUsername(viewedProfile)}
+                AND u.username LIKE '%${req.body.query}%'
                 AND a.type = 1;`, async (err, row) => {
         if (err) {
             console.log(`/userFeed associate query ERROR: ${err}`);
