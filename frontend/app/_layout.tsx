@@ -22,6 +22,12 @@ const RootLayout = () => {
                 }}
             />
             <Stack.Screen
+                name="EmailVerification"
+                options={{
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
                 name="p"
                 options={{
                     headerShown: false,
