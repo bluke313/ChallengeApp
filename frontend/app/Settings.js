@@ -7,6 +7,8 @@ import { colors } from '../assets/theme';
 import { StyledTextInput } from './Components/Input';
 import { retrieveSecret } from './Storage';
 import PhotoUpload from '@components/PhotoUpload.js'
+import * as ImageManipulator from 'expo-image-manipulator';
+import ImageEditor from '@components/ImageManipulator.js'
 
 
 const Settings = () => {
@@ -82,6 +84,7 @@ const Settings = () => {
 
     return (
         <View style={styles.view}>
+            {/* <ImageEditor /> */}
             <Button text="Return" onPress={() => router.push(`/p/${user}`)} />
 
             <View style={styles.container}>
