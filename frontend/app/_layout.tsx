@@ -1,4 +1,4 @@
-import { Stack} from "expo-router";
+import { Stack } from "expo-router";
 
 const RootLayout = () => {
     return (
@@ -17,6 +17,12 @@ const RootLayout = () => {
             />
             <Stack.Screen
                 name="Login"
+                options={{
+                    headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name="EmailVerification"
                 options={{
                     headerShown: false,
                 }}

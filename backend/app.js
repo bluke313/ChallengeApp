@@ -1,13 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3')
-const bcrypt = require('bcrypt')
+const sqlite3 = require('sqlite3');
+const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const fs = require("fs")
-const multer = require('multer') //import for storing images
-const path = require('path')
+const fs = require("fs");
+const multer = require('multer'); //import for storing images
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.API_KEY);
 
 // Set the web server
 const app = express();
@@ -659,8 +663,37 @@ router.route('/newChallenge').get(authenticateToken, async (req, res) => {
 });
 
 router.route('/updateProfile').post(authenticateToken, async (req, res) => {
-    db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
-    res.status(200).send({})
+    db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`);
+    res.status(200).send({});
+});
+
+
+router.route('/sendVerificationEmail').post( async (req, res) => {
+    console.log(`Your API Key is: ${process.env.API_KEY}`);
+    const { email, verificationCode } = req.body;
+
+    const msg = {
+        to: email,
+        from: 'luke313@outlook.com',
+        subject: 'Questy email verification',
+        text: `Your verification code is: ${verificationCode}`,
+        html: `<p>Your verification code is: <strong>${verificationCode}</strong></p>`,
+    };
+
+    try {
+        await sgMail.send(msg);
+        res.status(200).json({ message: 'Verification email sent!' });
+        console.log('success');
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error sending email', error: error.response.body });
+    }
+});
+
+router.route('/verifyEmail').post( (req, res) => {
+    const { email } = req.body;
+    db.run(`UPDATE Users SET verification = 1 WHERE email = '${email}';`);
+    res.status(200).send({});
 });
 
 app.use(express.static('public'));
@@ -668,4 +701,4 @@ app.use(express.static('public'));
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}...`)
-})
+});

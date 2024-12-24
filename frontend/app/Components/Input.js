@@ -19,7 +19,7 @@ export const StyledTextInput = ({...rest}, ref) => {
             {...rest} 
         />
     )
-}
+};
 
 export const SecureTextinput = ({...rest}) => {
     const [showPassword, setShowPassword] = useState(false)
@@ -40,7 +40,7 @@ export const SecureTextinput = ({...rest}) => {
             </Pressable>
         </View>
     )
-}
+};
 
 const styles = StyleSheet.create({
     input: {
