@@ -93,7 +93,7 @@ export default function Camera() {
   return (
     <View style={styles.container}>
       {cameraState()}
-      <Tabs currentPage={0} handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/>
+      <Tabs currentPage={1} handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/>
     </View>
   );
 }
