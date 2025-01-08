@@ -1,13 +1,18 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3')
-const bcrypt = require('bcrypt')
+const sqlite3 = require('sqlite3');
+const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const fs = require("fs")
-const multer = require('multer') //import for storing images
-const path = require('path')
+const fs = require("fs");
+const multer = require('multer'); //import for storing images
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.API_KEY);
+const emailSenderAddress = process.env.EMAIL_SENDER_ADDRESS
 
 // Set the web server
 const app = express();
@@ -201,7 +206,7 @@ router.route('/login').post(async (req, res) => {
             }
 
 
-            res.status(200).send({ "message": "User Logged In", "success": true, "username": row.username, "token": token })
+            res.status(200).send({ "message": "User Logged In", "success": true, "verification": row.verification, "username": row.username, "token": token })
             return
         }
         res.status(200).send({ "message": "Password incorrect!", "success": false })
@@ -445,7 +450,7 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
             INNER JOIN Users u
             ON u.id = a.targetUserId
             WHERE a.userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)}
-            AND u.username LIKE '%${req.body.query}%';`, async (err, row) => {
+            AND u.username LIKE '%${req.body.query}%' AND u.verification = 1;`, async (err, row) => {
         if (err) {
             console.log(`/userFeed associate query ERROR: ${err}`);
             res.status(500).send({ 'message': 'Database error!', 'success': false });
@@ -456,7 +461,7 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
 
             //query to get all user's matching
             db.all(`SELECT id, username, pfpPath FROM Users
-                    WHERE username LIKE '%${req.body.query}%' AND id NOT IN (${exclusionString});`,
+                    WHERE username LIKE '%${req.body.query}%' AND id NOT IN (${exclusionString}) AND verification = 1;`,
                 async (err, row) => {
                     if (err) {
                         console.log(`/userFeed non-associate query ERROR: ${err}`);
@@ -592,7 +597,18 @@ router.route('/associationRequest').post(authenticateToken, async (req, res) => 
 })
 
 router.route('/whoami').get(authenticateToken, async (req, res) => {
-    res.status(200).send({ "username": req.body.userId.userId })
+    db.get(`SELECT username, email, verification FROM Users WHERE username = '${req.body.userId.userId}';`, async (err, row) => {
+        if (err) {
+            console.log(`/whoami ERROR: ${err}`);
+            res.status(500).send({ 'message': 'Database error!', 'success': false });
+        }
+        else {
+            res.status(200).send(row)
+        }
+    }
+    )
+
+    // res.status(200).send({ "username": req.body.userId.userId })
 })
 
 //SELECT * FROM Challenges WHERE start = '2024-10-4 00:00:00';
@@ -659,8 +675,35 @@ router.route('/newChallenge').get(authenticateToken, async (req, res) => {
 });
 
 router.route('/updateProfile').post(authenticateToken, async (req, res) => {
-    db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`)
-    res.status(200).send({})
+    db.run(`UPDATE Users SET bio = '${req.body.bio}' WHERE username = '${req.body.userId.userId}';`);
+    res.status(200).send({});
+});
+
+
+router.route('/sendVerificationEmail').post( async (req, res) => {
+    const { email, verificationCode } = req.body;
+
+    const msg = {
+        to: email,
+        from: emailSenderAddress,
+        subject: 'Questy email verification',
+        text: `Your verification code is: ${verificationCode}`,
+        html: `<p>Your verification code is: <strong>${verificationCode}</strong></p>`,
+    };
+
+    try {
+        await sgMail.send(msg);
+        res.status(200).json({ message: 'Verification email sent!' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error sending email', error: error.response.body });
+    }
+});
+
+router.route('/verifyEmail').post(authenticateToken, (req, res) => {
+    const { email } = req.body;
+    db.run(`UPDATE Users SET verification = 1 WHERE email = '${email}';`);
+    res.status(200).send({});
 });
 
 app.use(express.static('public'));
@@ -668,4 +711,4 @@ app.use(express.static('public'));
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}...`)
-})
+});

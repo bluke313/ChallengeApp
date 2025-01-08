@@ -14,6 +14,7 @@ export default function Page() {
         <Button onPress={() => router.push("/Login")} text='Login'/>
         <Button onPress={() => router.push("/SignUp")} text='SignUp'/>
         <Button onPress={() => router.push("/home")} text='Home'/>
+        <Button onPress={() => router.push("/EmailVerification")} text='Email Verification'/>
       </View>
     </View>
   );

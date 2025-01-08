@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import axios from 'axios'
 
 
-export const whoAmI = async (setState) => {
+export const whoAmI = async (setUsername, setEmail, setVerified) => {
     try {
         const token = await retrieveSecret('authToken')
         const response = await fetch(
@@ -20,7 +20,12 @@ export const whoAmI = async (setState) => {
         const responseJson = await response.json();
         
         if(response.status === 200){
-            setState(responseJson.username)
+            if(setUsername)
+                setUsername(responseJson.username)
+            if(setEmail)
+                setEmail(responseJson.email)
+            if(setVerified)
+                setVerified(responseJson.verification == 1)
         }
         else {
             dropSecret('authToken')
@@ -132,3 +137,65 @@ export const photoUpload = async (photo) => {
 
     // fresh()
   };
+
+
+// ===================
+// Email Verification
+// ===================
+export const sendVerificationEmail = async (email, setVerificationCode, setIsDisabled) => {
+    verificationCode = Math.floor(1000 + Math.random() * 9000).toString()
+    setVerificationCode(verificationCode); // generate a 4 digit code that cannot start with 0
+    try {
+        const response = await fetch(
+            'http://localhost:3000/sendVerificationEmail',
+            {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    verificationCode: verificationCode,
+                })
+            }
+        );
+        const responseJson = await response.json();
+        // if (responseJson.success) {
+        // }
+        // else {
+        //     console.log("Error in verification email network call")
+        // }
+    } catch (error) {
+        console.error(error);
+    }
+
+    setIsDisabled(true);
+    setTimeout(() => {
+        setIsDisabled(false);
+    }, 30 * 1000);
+};
+
+export const verifyEmail = async (email) => {
+    try {
+        const token = await retrieveSecret('authToken')
+        const response = await fetch(
+            'http://localhost:3000/verifyEmail',
+            {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    "email": email
+                })
+            }
+        );
+        const responseJson = await response.json();
+
+    } catch (error) {
+        console.error(error);
+    }
+}
