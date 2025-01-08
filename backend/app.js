@@ -450,7 +450,7 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
             INNER JOIN Users u
             ON u.id = a.targetUserId
             WHERE a.userId = ${getSQLStringUserIdFromUsername(req.body.userId.userId)}
-            AND u.username LIKE '%${req.body.query}%';`, async (err, row) => {
+            AND u.username LIKE '%${req.body.query}%' AND u.verification = 1;`, async (err, row) => {
         if (err) {
             console.log(`/userFeed associate query ERROR: ${err}`);
             res.status(500).send({ 'message': 'Database error!', 'success': false });
@@ -461,7 +461,7 @@ router.route('/userFeed').post(authenticateToken, async (req, res) => {
 
             //query to get all user's matching
             db.all(`SELECT id, username, pfpPath FROM Users
-                    WHERE username LIKE '%${req.body.query}%' AND id NOT IN (${exclusionString});`,
+                    WHERE username LIKE '%${req.body.query}%' AND id NOT IN (${exclusionString}) AND verification = 1;`,
                 async (err, row) => {
                     if (err) {
                         console.log(`/userFeed non-associate query ERROR: ${err}`);
