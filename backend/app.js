@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const sgMail = require('@sendgrid/mail');
 
 sgMail.setApiKey(process.env.API_KEY);
+const emailSenderAddress = process.env.EMAIL_SENDER_ADDRESS
 
 // Set the web server
 const app = express();
@@ -596,7 +597,18 @@ router.route('/associationRequest').post(authenticateToken, async (req, res) => 
 })
 
 router.route('/whoami').get(authenticateToken, async (req, res) => {
-    res.status(200).send({ "username": req.body.userId.userId })
+    db.get(`SELECT username, email, verification FROM Users WHERE username = '${req.body.userId.userId}';`, async (err, row) => {
+        if (err) {
+            console.log(`/whoami ERROR: ${err}`);
+            res.status(500).send({ 'message': 'Database error!', 'success': false });
+        }
+        else {
+            res.status(200).send(row)
+        }
+    }
+    )
+
+    // res.status(200).send({ "username": req.body.userId.userId })
 })
 
 //SELECT * FROM Challenges WHERE start = '2024-10-4 00:00:00';
@@ -669,12 +681,11 @@ router.route('/updateProfile').post(authenticateToken, async (req, res) => {
 
 
 router.route('/sendVerificationEmail').post( async (req, res) => {
-    console.log(`Your API Key is: ${process.env.API_KEY}`);
     const { email, verificationCode } = req.body;
 
     const msg = {
         to: email,
-        from: 'luke313@outlook.com',
+        from: emailSenderAddress,
         subject: 'Questy email verification',
         text: `Your verification code is: ${verificationCode}`,
         html: `<p>Your verification code is: <strong>${verificationCode}</strong></p>`,
@@ -683,14 +694,13 @@ router.route('/sendVerificationEmail').post( async (req, res) => {
     try {
         await sgMail.send(msg);
         res.status(200).json({ message: 'Verification email sent!' });
-        console.log('success');
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error sending email', error: error.response.body });
     }
 });
 
-router.route('/verifyEmail').post( (req, res) => {
+router.route('/verifyEmail').post(authenticateToken, (req, res) => {
     const { email } = req.body;
     db.run(`UPDATE Users SET verification = 1 WHERE email = '${email}';`);
     res.status(200).send({});

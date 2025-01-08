@@ -43,7 +43,7 @@ const SignUp = (props) => {
             if (responseJson.success) {
                 // props.handleLogin(responseJson.username);
                 await storeSecret('authToken', responseJson.token);
-                router.push(`/home`);
+                router.push(`/EmailVerification`);
             }
             else {
                 setErrorMsg(responseJson.message);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import {sendVerificationEmail, whoAmI, verifyEmail} from "@components/Network.js"
 
 const EmailVerification = () => {
     const [isHovered, setIsHovered] = useState(false);
@@ -10,41 +11,12 @@ const EmailVerification = () => {
     const [verificationCode, setVerificationCode] = useState(null);
     const [code, setCode] = useState(["", "", "", ""]);
     const inputs = useRef([]);
+    const [email, setEmail] = useState("");
+    const [verified, setVerified] = useState(false)
 
-    const email = "bluke313@vt.edu" // *to do* get the user's email
+    // const email = "bluke313@vt.edu" // *to do* get the user's email
 
-    const sendVerificationEmail = async () => {
-        setVerificationCode(Math.floor(1000 + Math.random() * 9000).toString()); // generate a 4 digit code that cannot start with 0
-        // try {
-        //     const response = await fetch(
-        //         'http://localhost:3000/sendVerificationEmail',
-        //         {
-        //             method: 'POST',
-        //             headers: {
-        //                 Accept: 'application/json',
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify({
-        //                 email: email,
-        //                 verificationCode: verificationCode,
-        //             })
-        //         }
-        //     );
-        //     const responseJson = await response.json();
-        //     if (responseJson.success) {
-        //     }
-        //     else {
-        //         setErrorMsg(responseJson.message);
-        //     }
-        // } catch (error) {
-        //     console.error(error);
-        // }
 
-        setIsDisabled(true);
-        setTimeout(() => {
-            setIsDisabled(false);
-        }, 2 * 1000); // *to do* disable button for 30 seconds
-    };
 
     const handleChangeText = (text, index) => {
         const newCode = [...code];
@@ -66,8 +38,7 @@ const EmailVerification = () => {
 
     // return true if verified
     const checkVerified = () => {
-        // *to do* if verified == 1 from db, login
-        return false;
+        whoAmI(null, setEmail, setVerified)
     };
 
     // print verificationCode for testing 
@@ -76,10 +47,11 @@ const EmailVerification = () => {
 
     // auto send email on open or login if verified
     useEffect(() => {
-        if (!checkVerified()) {
-            sendVerificationEmail(); // send an email
+        checkVerified()
+        if (!verified && email != "") {
+            sendVerificationEmail(email, setVerificationCode, setIsDisabled); // send an email
         }
-    }, []);
+    }, [verified, email]);
 
     // auto detect fully typed 4-digit code
     useEffect(() => {
@@ -95,6 +67,7 @@ const EmailVerification = () => {
         if (fullCode) {
             if (codeString == verificationCode) {
                 console.log('code matched');
+                verifyEmail(email)
                 // *to do* set email verified in db and login
                 // router.push('/login');
             }
@@ -131,7 +104,7 @@ const EmailVerification = () => {
             <Text
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onPress={isDisabled ? null : sendVerificationEmail}
+                onPress={isDisabled ? null : () => sendVerificationEmail(email, setVerificationCode, setIsDisabled)}
                 style={isDisabled
                     ?
                     { color: 'grey' }
@@ -139,14 +112,6 @@ const EmailVerification = () => {
                     isHovered ? { color: '#8bdbb3', textDecorationLine: 'underline', cursor: 'pointer' } : { color: '#8bdbb3' }}
             >Resend email</Text>
             {isDisabled ? <Text style={styles.text}>Please wait 30 seconds before trying again</Text> : <View style={{ height: 19 }}/>}
-            <View style={{ position: 'absolute', bottom: 50 }}>
-                <Text
-                    onMouseEnter={() => setIsHovered2(true)}
-                    onMouseLeave={() => setIsHovered2(false)}
-                    onPress={() => checkVerified()}
-                    style={isHovered2 ? styles.bottomTextHover : styles.bottomText}
-                >I am verfified</Text>
-            </View>
         </View>
     );
 
