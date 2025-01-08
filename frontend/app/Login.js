@@ -39,7 +39,10 @@ const Login = (props) => {
             const responseJson = await response.json();
             if (responseJson.success) {
                 await storeSecret('authToken', responseJson.token)
-                router.push('/home');
+                if(responseJson.verification == 1)
+                    router.push('/home');
+                else
+                    router.push('/EmailVerification');
             }
             // BELOW IS AN ATTEMPT TO MAKE LOGIN ATTEMPTS WITH NEW EMAILS SEND YOU TO SIGNUP WITH THE EMAIL ALREADY ENTERED
             // else if (responseJson.errCode === 1) {

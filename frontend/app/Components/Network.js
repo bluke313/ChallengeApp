@@ -173,7 +173,7 @@ export const sendVerificationEmail = async (email, setVerificationCode, setIsDis
     setIsDisabled(true);
     setTimeout(() => {
         setIsDisabled(false);
-    }, 2 * 1000); // *to do* disable button for 30 seconds
+    }, 30 * 1000);
 };
 
 export const verifyEmail = async (email) => {

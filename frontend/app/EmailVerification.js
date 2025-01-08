@@ -14,10 +14,6 @@ const EmailVerification = () => {
     const [email, setEmail] = useState("");
     const [verified, setVerified] = useState(false)
 
-    // const email = "bluke313@vt.edu" // *to do* get the user's email
-
-
-
     const handleChangeText = (text, index) => {
         const newCode = [...code];
         newCode[index] = text;
@@ -42,7 +38,7 @@ const EmailVerification = () => {
     };
 
     // print verificationCode for testing 
-    // *to do* delete
+    // TODO Delete when we don't have fake email accounts anymore
     useEffect(() => { console.log("verificationCode: " + verificationCode); }, [verificationCode]);
 
     // auto send email on open or login if verified
@@ -50,6 +46,9 @@ const EmailVerification = () => {
         checkVerified()
         if (!verified && email != "") {
             sendVerificationEmail(email, setVerificationCode, setIsDisabled); // send an email
+        }
+        else if(verified){
+            router.push("/home")
         }
     }, [verified, email]);
 
@@ -68,8 +67,8 @@ const EmailVerification = () => {
             if (codeString == verificationCode) {
                 console.log('code matched');
                 verifyEmail(email)
-                // *to do* set email verified in db and login
-                // router.push('/login');
+                //TODO future work make it check for positive response
+                router.push('/home');
             }
             else {
                 setShowError(true);

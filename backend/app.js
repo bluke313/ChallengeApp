@@ -206,7 +206,7 @@ router.route('/login').post(async (req, res) => {
             }
 
 
-            res.status(200).send({ "message": "User Logged In", "success": true, "username": row.username, "token": token })
+            res.status(200).send({ "message": "User Logged In", "success": true, "verification": row.verification, "username": row.username, "token": token })
             return
         }
         res.status(200).send({ "message": "Password incorrect!", "success": false })
