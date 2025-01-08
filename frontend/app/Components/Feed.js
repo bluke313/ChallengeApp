@@ -120,6 +120,13 @@ export const UserFeed = ({ onClose, user, searchText }) => {
         }
     })
 
+    const mapData = (data) => {
+        if (data.username === user){
+            data.type = -2
+        }
+        return data
+    }
+
     return (
 
         <View style={styles.container}>
@@ -129,7 +136,7 @@ export const UserFeed = ({ onClose, user, searchText }) => {
                 (feedData.length == 0 ? 
                     <Text style={{ opacity: '50%', color: colors.accent }}>No Results Found</Text> 
                     : 
-                    feedData.map((data, i) => <UsernameLink onClose={onClose} key={i} data={data} />))
+                    feedData.map((data, i) => <UsernameLink onClose={onClose} key={i} data={mapData(data)} />))
             }
         </View>
     )
@@ -156,7 +163,6 @@ export const FriendsFeed = ({ onClose, user, searchText }) => {
                 }
             );
             const responseJson = await response.json();
-            console.log(responseJson.matches);
             setFeedData(responseJson.matches);
         } catch (err) {
             console.error(err);
@@ -281,7 +287,6 @@ export const ProfileFeed = ({ user, fresh }) => {
         const fetchProfile = async () => {
             try {
                 const token = await retrieveSecret('authToken')
-                // console.log(`Token: ${token}`)
                 const response = await fetch(
                     'http://localhost:3000/profile',
                     {

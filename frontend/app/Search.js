@@ -29,7 +29,7 @@ export const Search = ({onClose}) => {
                     value={searchText}
                     onChangeText={setSearchText}
                 />
-                <UserFeed onClose={onClose} searchText={searchText}/>
+                <UserFeed onClose={onClose} user={username} searchText={searchText}/>
             </ScrollView>
             {/* <Tabs handleHome={() => router.push('/home')} handleProfile={() => router.push(`/p/${username}`)}/> */}
         </View>
